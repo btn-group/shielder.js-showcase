@@ -10,6 +10,7 @@ import { toast } from 'react-hot-toast'
 import 'twin.macro'
 
 import {initWasm, foo, deposit} from 'shielder-sdk';
+import ContractCall from '@components/web3/ContractCall'
 
 const HomePage: NextPage = () => {
   const {accounts} = useInkathon();
@@ -35,7 +36,11 @@ const HomePage: NextPage = () => {
 
   const clickFoo = async () => {
     // await run_prover();
+    const start = Date.now();
+    console.log(start)
     await deposit();
+    const finish = Date.now();
+    console.log(finish - start);
   }
 
   return (
@@ -50,6 +55,7 @@ const HomePage: NextPage = () => {
           <ActionsTabs />
         </div>
         <button tw="m-4 px-4 py-3 bg-white text-black rounded-md font-bold" onClick={async () => await clickFoo()}>CLICK ME - FOO</button>
+        <ContractCall />
 
         <div tw="mt-10 flex w-full flex-wrap items-start justify-center gap-4">
           {/* Chain Metadata Information */}
