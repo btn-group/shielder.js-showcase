@@ -31,14 +31,14 @@ function MyApp({ Component, pageProps }: AppProps) {
       <DefaultSeo
         dangerouslySetAllPagesToNoFollow={!env.isProduction}
         dangerouslySetAllPagesToNoIndex={!env.isProduction}
-        defaultTitle="ink!athon" // TODO
-        titleTemplate="%s | ink!athon" // TODO
-        description="Substrate-based Smart Contract & DApp Development Boilerplate" // TODO
+        defaultTitle="shielderJS" // TODO
+        titleTemplate="%s | shielderJS" // TODO
+        description="Zero Knowlede Proof in your Browser. Keep your critical data private." // TODO
         openGraph={{
           type: 'website',
           locale: 'en',
           url: env.url,
-          site_name: 'ink!athon', // TODO
+          site_name: 'shielderJS', // TODO
           images: [
             {
               url: `${env.url}/images/cover.jpg`, // TODO
@@ -64,8 +64,8 @@ function MyApp({ Component, pageProps }: AppProps) {
       </Head>
 
       <UseInkathonProvider
-        appName="ink!athon" // TODO
-        connectOnInit={false}
+        appName="shielder.js" // TODO
+        connectOnInit={true}
         defaultChain={env.defaultChain}
         // deployments={getDeployments()}
       >

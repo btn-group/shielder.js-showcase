@@ -14,12 +14,12 @@ const StyledIconLink = styled(Link)(() => [
 ])
 
 export const HomePageTitle: FC = () => {
-  const title = 'ink!athon'
-  const desc = 'Full-Stack DApp Boilerplate for Substrate and ink! Smart Contracts'
-  const githubHref = 'https://github.com/scio-labs/inkathon'
-  const deployHref = 'https://github.com/scio-labs/inkathon#deployment'
-  const sponsorHref = 'mailto:hello@scio.xyz'
-  const telegramHref = 'https://t.me/inkathon'
+  const title = 'shielderJS'
+  const desc = 'zero Knowledge proof in browser. Keep your private data localy'
+  const githubHref = 'https://github.com/Degen-Alliance/shielder.js'
+  // const deployHref = 'https://github.com/Degen-Alliance/shielder.js'
+  // const sponsorHref = 'mailto:contact@syncra.xyz'
+  // const telegramHref = 'https://t.me/inkathon'
 
   return (
     <>
@@ -31,7 +31,7 @@ export const HomePageTitle: FC = () => {
           className="group"
           tw="flex cursor-pointer items-center gap-4 rounded-3xl py-1.5 px-3.5 transition-all hover:bg-gray-900"
         >
-          <Image src={inkathonLogo} priority width={60} alt="ink!athon Logo" />
+          <Image src={inkathonLogo} priority width={60} alt="shielderJS Logo" />
           <h1 tw="font-black text-[2.5rem]">{title}</h1>
         </Link>
 
@@ -39,25 +39,17 @@ export const HomePageTitle: FC = () => {
         <p tw="mt-2 text-gray-600 text-sm">
           By{' '}
           <a
-            href="https://zoma.dev"
+            href="https://github.com/Degen-Alliance"
             target="_blank"
             tw="font-semibold text-gray-500 hover:text-gray-100"
           >
-            Dennis Zoma
-          </a>{' '}
-          &{' '}
-          <a
-            href="https://scio.xyz"
-            target="_blank"
-            tw="font-semibold text-gray-500 hover:text-gray-100"
-          >
-            Scio Labs
+            Degen Alliance
           </a>
         </p>
         <p tw="mt-4 mb-6 text-gray-400">{desc}</p>
 
         {/* Github & Vercel Buttons */}
-        <div tw="flex space-x-2">
+        {/* <div tw="flex space-x-2">
           <StyledIconLink href={githubHref} target="_blank">
             <Image src={githubIcon} priority height={32} alt="Github Repository" />
           </StyledIconLink>
@@ -70,7 +62,7 @@ export const HomePageTitle: FC = () => {
           <StyledIconLink href={sponsorHref} target="_blank">
             <Image src={sponsorIcon} priority height={32} alt="Sponsor the Project" />
           </StyledIconLink>
-        </div>
+        </div> */}
 
         <div tw="my-14 w-14 bg-gray-800 h-[2px]" />
       </div>
