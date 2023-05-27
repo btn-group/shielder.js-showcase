@@ -5,7 +5,7 @@ import { env } from '@config/environment'
 // import { getDeployments } from '@deployments/deployments'
 import { cache } from '@emotion/css'
 import { CacheProvider } from '@emotion/react'
-import { UseInkathonProvider } from '@scio-labs/use-inkathon'
+import { UseInkathonProvider, development } from '@scio-labs/use-inkathon'
 import GlobalStyles from '@styles/GlobalStyles'
 import { DefaultSeo } from 'next-seo'
 import type { AppProps } from 'next/app'
@@ -25,6 +25,9 @@ const inconsolata = Inconsolata({
 })
 
 function MyApp({ Component, pageProps }: AppProps) {
+  console.log(development);
+  development.rpcUrls = ['ws://0.tcp.eu.ngrok.io:17220/ws'];
+
   return (
     <>
       {/* TODO SEO */}
@@ -65,8 +68,8 @@ function MyApp({ Component, pageProps }: AppProps) {
 
       <UseInkathonProvider
         appName="shielder.js" // TODO
-        connectOnInit={true}
-        defaultChain={env.defaultChain}
+        connectOnInit={false}
+        defaultChain={development}
         // deployments={getDeployments()}
       >
         <CacheProvider value={cache}>

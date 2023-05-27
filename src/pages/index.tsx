@@ -9,13 +9,34 @@ import { useEffect } from 'react'
 import { toast } from 'react-hot-toast'
 import 'twin.macro'
 
+import {initWasm, foo, deposit} from 'shielder-sdk';
+
 const HomePage: NextPage = () => {
+  const {accounts} = useInkathon();
+
+  console.log(accounts![0]);
+
   // Display `useInkathon` error messages (optional)
   const { error } = useInkathon()
   useEffect(() => {
     if (!error) return
     toast.error(error.message)
-  }, [error])
+  }, [error]);
+
+  useEffect(() => {
+    async function init() {
+      await initWasm();
+
+      
+    }
+    
+    init();
+  })
+
+  const clickFoo = async () => {
+    // await run_prover();
+    await deposit();
+  }
 
   return (
     <>
@@ -27,8 +48,9 @@ const HomePage: NextPage = () => {
         <ConnectButton />
         <div tw="mt-10 flex w-full flex-wrap items-start justify-center gap-4">
           <ActionsTabs />
-
         </div>
+        <button tw="m-4 px-4 py-3 bg-white text-black rounded-md font-bold" onClick={async () => await clickFoo()}>CLICK ME - FOO</button>
+
         <div tw="mt-10 flex w-full flex-wrap items-start justify-center gap-4">
           {/* Chain Metadata Information */}
           <ChainInfo />
