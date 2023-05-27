@@ -13,7 +13,7 @@ import { useState } from 'react';
 const MAX_CALL_WEIGHT = new BN(5_000_000_000_000).isub(BN_ONE);
 const PROOFSIZE = new BN(1_000_000);
 
-const shielderContractAddress = '5DeiFTx5mFBYqWvNECbZqnV4fZsvCQ7qgu3fp6F8HEY7ccHM';
+const shielderContractAddress = '5ETqdUdd2TLJuHxvXERxqHWh9M5ExKT5xpyJY69v1xSfso9d';
 const tokenContractAddress = '5HZPNyNBLb7hZLGpERKUPExWCiBQiRAfhaY3X1UimDZpVJxs';
 
 import {deposit, Deposit} from 'shielder-sdk';
@@ -51,7 +51,7 @@ export default function ContractCall() {
       const res = await contractQuery(api, activeAccount?.address!, contract?.contract!, 'psp22::allowance', {
         gasLimit,
         storageDepositLimit: null,
-      }, [activeAccount?.address!, '5DeiFTx5mFBYqWvNECbZqnV4fZsvCQ7qgu3fp6F8HEY7ccHM'])
+      }, [activeAccount?.address!, shielderContractAddress])
   
       console.log(res.output?.toJSON())
       setAllowance(res.output?.toJSON()?.ok);
@@ -68,7 +68,7 @@ export default function ContractCall() {
       const contractApi = new ContractPromise(
         api,
         TokenABI,
-        '5HZPNyNBLb7hZLGpERKUPExWCiBQiRAfhaY3X1UimDZpVJxs'
+        tokenContractAddress
       );
 
       // const gasLimit = api?.registry.createType("WeightV2", {
@@ -86,7 +86,7 @@ export default function ContractCall() {
           }) as WeightV2,
           storageDepositLimit: null,
         },
-        '5DeiFTx5mFBYqWvNECbZqnV4fZsvCQ7qgu3fp6F8HEY7ccHM', 10
+        shielderContractAddress, 10
       );
 
       // console.log({gasRequired, result, output});
@@ -98,24 +98,23 @@ export default function ContractCall() {
 
       // console.log(api, activeAccount, contract);
 
-      // const queryTx = await contractApi.tx['psp22::increaseAllowance'](
-      //   {
-      //     gasLimit,
-      //     storageDepositLimit: null,
-      //   },
-      //   '5DeiFTx5mFBYqWvNECbZqnV4fZsvCQ7qgu3fp6F8HEY7ccHM', 10
-      // );
+      const queryTx = await contractApi.tx['psp22::increaseAllowance'](
+        {
+          gasLimit,
+          storageDepositLimit: null,
+        },
+        shielderContractAddress, 10
+      );
     
-      // await queryTx.signAndSend(activeAccount?.address!, async (res) => {
-      //   if (res.status.isInBlock) {
-      //     console.log("in a block");
-      //   } else if (res.status.isFinalized) {
-      //     console.log("finalized");
-      //     console.log(res.toHuman());
-
-          
-      //   }
-      // });
+      await queryTx.signAndSend(activeAccount?.address!, async (res) => {
+        if (res.status.isInBlock) {
+          console.log("in a block");
+        } else if (res.status.isFinalized) {
+          console.log("finalized");
+          console.log("suckmycess");
+          console.log(res.toHuman());
+        }
+      });
 
       
 
@@ -152,6 +151,7 @@ export default function ContractCall() {
       };
 
       const depositWasmResult = await deposit(dep);
+      console.log(depositWasmResult);
       const depositWASMJSON = JSON.parse(depositWasmResult);
 
       console.log(depositWASMJSON);
@@ -175,10 +175,12 @@ export default function ContractCall() {
         0, 10, depositWASMJSON.note.map((not: number) => `${not}`), `0x${depositWASMJSON.proof}`
       );
 
+      
       const gasLimit = api?.registry.createType(
         "WeightV2",
         gasRequired
       ) as WeightV2;
+
 
       console.log({gasRequired, result, output});
 
@@ -195,9 +197,10 @@ export default function ContractCall() {
             console.log("in a block");
           } else if (res.status.isFinalized) {
             console.log("finalized");
+            // console.log(`STATUS_TO_JSON: ${res.status.toJSON()}`);
             console.log(res.toHuman());
-  
-            
+            console.log(res);
+            // console.log(`EEEVVVEEENNTTTYYY: ${res.events}`);
           }
         });
 
