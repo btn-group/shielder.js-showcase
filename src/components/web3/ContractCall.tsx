@@ -1,14 +1,17 @@
 import { useInkathon, useContract, contractQuery} from '@scio-labs/use-inkathon'
-import {deposit, Deposit, Withdraw} from 'shielder-sdk';
+import {deposit, Deposit, Withdraw, withdraw, parseData} from 'shielder-sdk';
 import { Button, Flex, Text } from '@chakra-ui/react';
 
 import { WeightV2 } from '@polkadot/types/interfaces';
 import { ContractPromise } from "@polkadot/api-contract";
 import { useEffect, useState } from 'react';
+const { hexToU8a } = require('@polkadot/util');
+const { decodeAddress } = require('@polkadot/keyring');
 
 import TokenABI from '../../abis/Token.json';
 import ShielderABI from '../../abis/Shielder.json';
 import { TOKEN_CONTRACT_ADDRESS, SHIELDER_CONTRACT_ADDRESS, MAX_CALL_WEIGHT, PROOFSIZE } from '@constants';
+import { getCurrentMerkleRoot, getMerklePath, withdrawDryRun } from '@utils/shielder';
 
 export default function ContractCall() {
   const [allowance, setAllowance] = useState('0');
@@ -54,8 +57,6 @@ export default function ContractCall() {
   }
 
   const increaseAllowance = async () => {
-    await getCurrentAllowance();
-
     if(api) {
       const contractApi = new ContractPromise(
         api,
@@ -72,7 +73,7 @@ export default function ContractCall() {
           }) as WeightV2,
           storageDepositLimit: null,
         },
-        SHIELDER_CONTRACT_ADDRESS, 10
+        SHIELDER_CONTRACT_ADDRESS, 100
       );
 
       const gasLimit = api?.registry.createType(
@@ -145,6 +146,7 @@ export default function ContractCall() {
       console.log('leaf', res.output?.toJSON());
       let bare_leaf = res.output?.toJSON().ok.ok;
       depositWASMJSON.leaf_idx = bare_leaf;
+      depositWASMJSON.proof = `0x${depositWASMJSON.proof}`;
       console.log('leaf2', depositWASMJSON.leaf_idx);
       setDepositJSON(depositWASMJSON)
 
@@ -171,21 +173,41 @@ export default function ContractCall() {
 
   const withdrawTokens = async () => {
     if(api) {
-        //TODO: get merkle root from Shielder
-        //TODO: get merkle_path from Shielder
-        //TODO: get recipient (field or connected wallet)
+        const currentAddress = activeAccount?.address!;
+        const { contract }  = shielderContract;
 
+        const currentMerkleRoot = await getCurrentMerkleRoot(api, currentAddress, contract!);
+        console.log({currentMerkleRoot});
 
-      const withdr: Withdraw = {
-        deposit: depositJSON,
-        withdraw_amount: depositJSON.token_amount,
-        fee: 0,
-        merkle_root: [0,0,0,0], //TODO change
-        merkle_path: 0,         //TODO change
-        recipient: 'dupa'       //TODO change
-      };
+        console.log(depositJSON);
+        const merklePath = await getMerklePath(api, currentAddress, contract!, depositJSON.leaf_idx -1);
+        // const merklePath = await getMerklePath(api, currentAddress, contract!, 65550);
+        console.log({merklePath});
 
-      //TODO: Dry run Shielder.withdraw to get updated DepositJSON
+        // TODO: Na razie pusty, testowy adres. Docelowo ma być input z frontu, albo obecnie połączony wallet.
+        const recipient = '5DWytQWs5WVg8akfFjavYFVkfUXBq11PZcfcTtH6tKqvboA6'; //burner
+
+        const withdrawData: Withdraw = {
+          deposit: depositJSON,
+          withdraw_amount: depositJSON.token_amount,
+          recipient: Array.from(decodeAddress(recipient)),
+          fee: 0,
+          merkle_root: currentMerkleRoot.map(num => Number.parseInt(num)),
+          merkle_path: merklePath.map(arr => arr.map(num => Number.parseInt(num)))
+        };
+
+        console.log(withdrawData);
+
+        const withdrawWasmResult = await withdraw(withdrawData);
+        const withdrawWASMJSON = JSON.parse(withdrawWasmResult);
+        console.log({withdrawWASMJSON});
+
+    
+
+      // //TODO: Dry run Shielder.withdraw to get updated DepositJSON
+      //   const withdrawDryRunResult = await withdrawDryRun(api, currentAddress, contract!, withdrawData);
+      //   console.log({withdrawDryRunResult})
+
       //TODO: SignAndCall Shielder.withdraw
       //TODO: Sace updated DepositJSON if token_amount != 0
     } else {
@@ -205,6 +227,8 @@ export default function ContractCall() {
       <Text textAlign={'center'}>Current Allowance: {allowance}</Text>
       <Button px={4} py={3} bgColor={"white"} textColor={"black"} rounded={'md'} fontWeight={"semibold"} onClick={async () => await increaseAllowance()}>Increase Allowance</Button>
       <Button px={4} py={3} bgColor={"white"} textColor={"black"} rounded={'md'} fontWeight={"semibold"} onClick={async () => await depositTokens()}>DEPOSIT</Button>
+      <Button px={4} py={3} bgColor={"red.500"} textColor={"white"} rounded={'md'} fontWeight={"semibold"} onClick={async () => await withdrawTokens()}>WITHDRAW</Button>
+      <Button px={4} py={3} bgColor={"red.500"} textColor={"white"} rounded={'md'} fontWeight={"semibold"} onClick={async () => await testParseData()}>TEST PARSE DATA</Button>
     </Flex>
     
   )
