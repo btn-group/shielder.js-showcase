@@ -228,7 +228,6 @@ export default function ContractCall() {
       <Button px={4} py={3} bgColor={"white"} textColor={"black"} rounded={'md'} fontWeight={"semibold"} onClick={async () => await increaseAllowance()}>Increase Allowance</Button>
       <Button px={4} py={3} bgColor={"white"} textColor={"black"} rounded={'md'} fontWeight={"semibold"} onClick={async () => await depositTokens()}>DEPOSIT</Button>
       <Button px={4} py={3} bgColor={"red.500"} textColor={"white"} rounded={'md'} fontWeight={"semibold"} onClick={async () => await withdrawTokens()}>WITHDRAW</Button>
-      <Button px={4} py={3} bgColor={"red.500"} textColor={"white"} rounded={'md'} fontWeight={"semibold"} onClick={async () => await testParseData()}>TEST PARSE DATA</Button>
     </Flex>
     
   )
