@@ -9,11 +9,13 @@ import { useEffect } from 'react'
 import { toast } from 'react-hot-toast'
 import 'twin.macro'
 
-import {initWasm, foo, deposit} from 'shielder-sdk';
+import { initWasm, foo, deposit } from 'shielder-sdk';
 import ContractCall from '@components/web3/ContractCall'
+import TopBar from '@components/tobBar/TopBar'
+import { MainView } from '@components/mainView/MainView'
 
 const HomePage: NextPage = () => {
-  const {accounts} = useInkathon();
+  const { accounts } = useInkathon();
 
   console.log(accounts![0]);
 
@@ -28,9 +30,9 @@ const HomePage: NextPage = () => {
     async function init() {
       await initWasm();
 
-      
+
     }
-    
+
     init();
   })
 
@@ -48,21 +50,7 @@ const HomePage: NextPage = () => {
       <CenterBody tw="mt-20 mb-10 px-5">
         {/* Title */}
         <HomePageTitle />
-
-        {/* Connect Wallet Button */}
-        <ConnectButton />
-        <div tw="mt-10 flex w-full flex-wrap items-start justify-center gap-4">
-          <ActionsTabs />
-        </div>
-        <button tw="m-4 px-4 py-3 bg-white text-black rounded-md font-bold" onClick={async () => await clickFoo()}>CLICK ME - FOO</button>
-        <ContractCall />
-
-        <div tw="mt-10 flex w-full flex-wrap items-start justify-center gap-4">
-          {/* Chain Metadata Information */}
-          <ChainInfo />
-
-          {/* Greeter Read/Write Contract Interactions */}
-        </div>
+        <MainView />
       </CenterBody>
     </>
   )

@@ -26,15 +26,13 @@ import {
 } from '@scio-labs/use-inkathon'
 import { truncateHash } from '@utils/truncateHash'
 import { useIsSSR } from '@utils/useIsSSR'
-import Image from 'next/image'
-import aznsIconSvg from 'public/icons/azns-icon.svg'
 import { FC, useState } from 'react'
 import { toast } from 'react-hot-toast'
 import { AiOutlineCheckCircle, AiOutlineDisconnect } from 'react-icons/ai'
 import { FiChevronDown, FiExternalLink } from 'react-icons/fi'
 import 'twin.macro'
 
-export interface ConnectButtonProps {}
+export interface ConnectButtonProps { }
 export const ConnectButton: FC<ConnectButtonProps> = () => {
   const {
     activeChain,
@@ -62,12 +60,16 @@ export const ConnectButton: FC<ConnectButtonProps> = () => {
         <MenuButton
           as={Button}
           isLoading={isConnecting}
-          size="md"
-          rightIcon={<FiChevronDown size={22} />}
-          py={6}
+          size="sm"
+          rightIcon={<FiChevronDown size={20} />}
+          py={4}
           fontWeight="bold"
-          rounded="2xl"
-          colorScheme="purple"
+          rounded="md"
+          bgColor="whiteAlpha.900"
+          color="black"
+          _hover={{
+            background: "whiteAlpha.800",
+          }}
         >
           Connect Wallet
         </MenuButton>

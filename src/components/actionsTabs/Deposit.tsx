@@ -1,4 +1,4 @@
-import { Button, Flex, HStack, Input, Stack, Step, StepDescription, StepIcon, StepIndicator, Stepper, StepSeparator, StepStatus, Text, useSteps } from '@chakra-ui/react'
+import { Button, Flex, Input, Stack, Step, StepIcon, StepIndicator, Stepper, StepSeparator, StepStatus, Text, useSteps } from '@chakra-ui/react'
 import React, { useEffect } from 'react'
 
 
