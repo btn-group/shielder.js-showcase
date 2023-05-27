@@ -70,7 +70,6 @@ function MyApp({ Component, pageProps }: AppProps) {
         appName="shielder.js" // TODO
         connectOnInit={false}
         defaultChain={development}
-        // deployments={getDeployments()}
       >
         <CacheProvider value={cache}>
           <ChakraProvider>
