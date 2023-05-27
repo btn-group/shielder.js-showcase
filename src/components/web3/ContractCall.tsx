@@ -5,8 +5,7 @@ import { Button, Flex, Text } from '@chakra-ui/react';
 import { WeightV2 } from '@polkadot/types/interfaces';
 import { ContractPromise } from "@polkadot/api-contract";
 import { useEffect, useState } from 'react';
-const { hexToU8a } = require('@polkadot/util');
-const { decodeAddress } = require('@polkadot/keyring');
+const { decodeAddress, encodeAddress } = require('@polkadot/keyring');
 
 import TokenABI from '../../abis/Token.json';
 import ShielderABI from '../../abis/Shielder.json';
@@ -143,11 +142,10 @@ export default function ContractCall() {
         storageDepositLimit: null,
       }, [0, 10, depositWASMJSON.note.map((not: number) => `${not}`), `0x${depositWASMJSON.proof}`])
   
-      console.log('leaf', res.output?.toJSON());
+      
       let bare_leaf = res.output?.toJSON().ok.ok;
-      depositWASMJSON.leaf_idx = bare_leaf;
+      depositWASMJSON.leaf_idx = bare_leaf - 1;
       depositWASMJSON.proof = `0x${depositWASMJSON.proof}`;
-      console.log('leaf2', depositWASMJSON.leaf_idx);
       setDepositJSON(depositWASMJSON)
 
       const queryTx = await contractApi.tx['deposit'](
@@ -180,7 +178,7 @@ export default function ContractCall() {
         console.log({currentMerkleRoot});
 
         console.log(depositJSON);
-        const merklePath = await getMerklePath(api, currentAddress, contract!, depositJSON.leaf_idx -1);
+        const merklePath = await getMerklePath(api, currentAddress, contract!, depositJSON.leaf_idx);
         // const merklePath = await getMerklePath(api, currentAddress, contract!, 65550);
         console.log({merklePath});
 
@@ -192,21 +190,33 @@ export default function ContractCall() {
           withdraw_amount: depositJSON.token_amount,
           recipient: Array.from(decodeAddress(recipient)),
           fee: 0,
-          merkle_root: currentMerkleRoot.map(num => Number.parseInt(num)),
-          merkle_path: merklePath.map(arr => arr.map(num => Number.parseInt(num)))
+          merkle_root: currentMerkleRoot.map(num => {
+            if (num !== 0) {
+            return num.toString(16);
+            }
+            return "0x0";
+          }),
+          merkle_path: merklePath.map(arr => arr.map(num => {
+            if (num !== 0) {
+            return num.toString(16);
+            }
+            return "0x0";
+          }))
         };
 
         console.log(withdrawData);
 
+        console.time('WITHDRAW');
         const withdrawWasmResult = await withdraw(withdrawData);
+        console.timeEnd('WITHDRAW');
         const withdrawWASMJSON = JSON.parse(withdrawWasmResult);
         console.log({withdrawWASMJSON});
 
-    
+        withdrawData.recipient = recipient;
 
       // //TODO: Dry run Shielder.withdraw to get updated DepositJSON
-      //   const withdrawDryRunResult = await withdrawDryRun(api, currentAddress, contract!, withdrawData);
-      //   console.log({withdrawDryRunResult})
+        const withdrawDryRunResult = await withdrawDryRun(api, currentAddress, contract!, withdrawData);
+        console.log({withdrawDryRunResult})
 
       //TODO: SignAndCall Shielder.withdraw
       //TODO: Sace updated DepositJSON if token_amount != 0

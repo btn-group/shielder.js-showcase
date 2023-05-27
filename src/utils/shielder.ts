@@ -34,21 +34,26 @@ export const getMerklePath = async (api: ApiPromise, accountAddress: string, shi
 }
 
 export const withdrawDryRun = async (api: ApiPromise, accountAddress: string, shielderContract: ContractPromise, withdrawData: Withdraw) => {
+  const args = [
+    withdrawData.deposit.token_id, 
+    withdrawData.withdraw_amount, 
+    withdrawData.recipient,
+    withdrawData.fee,
+    withdrawData.merkle_root.map(num => num.toString()),
+    withdrawData.deposit.nullifier.map(num => num.toString()),
+    withdrawData.deposit.note.map(num => num.toString()),
+    withdrawData.deposit.proof,
+  ];
+
+  console.log(args);
+
   const res = await contractQuery(api, accountAddress, shielderContract, 'withdraw', {
     gasLimit: api?.registry.createType("WeightV2", {
       refTime: MAX_CALL_WEIGHT,
       proofSize: PROOFSIZE,
     }) as WeightV2,
     storageDepositLimit: null
-  }, [
-    withdrawData.deposit.token_id, 
-    withdrawData.withdraw_amount, 
-    withdrawData.recipient,
-    withdrawData.fee,
-    withdrawData.merkle_root,
-    withdrawData.deposit.nullifier,
-    withdrawData.deposit.note,
-  ]);
+  }, args);
 
   console.log('withdrawDryRun', res.output?.toJSON());
 
