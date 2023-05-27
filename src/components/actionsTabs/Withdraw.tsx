@@ -1,4 +1,4 @@
-import { Stack, Input, Button, Stepper, Step, StepIndicator, StepStatus, StepIcon, StepSeparator, Text, useSteps } from '@chakra-ui/react'
+import { Stack, Input, Button, Stepper, Step, StepIndicator, StepStatus, StepIcon, StepSeparator, Text, useSteps, Flex } from '@chakra-ui/react'
 import React from 'react'
 
 const steps = [
@@ -25,12 +25,15 @@ const Withdraw = () => {
     }
 
     return (
-        <Stack spacing={3}>
-            <Input placeholder='Token ID' size='md' />
-            <Input placeholder='Deposit amount' size='md' />
+        <Stack spacing={8}>
+            <Flex flexDirection={'column'} gap={4}>
+                <Input placeholder='Token ID' size='md' />
+                <Input placeholder='Deposit amount' size='md' />
+            </Flex>
+            
             <Button onClick={fakeDeposit}>Deposit</Button>
 
-            <Stack>
+            <Stack spacing={4}>
                 <Stepper size='sm' index={activeStep} gap='0' showLastSeparator={false}>
                     {steps.map((step, index) => (
                         <Step key={index}>
@@ -41,8 +44,8 @@ const Withdraw = () => {
                         </Step>
                     ))}
                 </Stepper>
-                <Text>
-                    Step {activeStep + 1}: <b>{activeStepText}</b>
+                <Text textAlign={'center'}>
+                    <b>{activeStepText}</b>
                 </Text>
             </Stack>
         </Stack>

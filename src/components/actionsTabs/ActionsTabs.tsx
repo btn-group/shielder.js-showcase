@@ -1,14 +1,14 @@
 import React from 'react'
 import { Tabs, TabList, TabPanels, Tab, TabPanel, Box } from '@chakra-ui/react'
-import Deposit from '@components/deposit/Deposit'
-import Withdraw from '@components/withdraw/Withdraw'
+import Deposit from '@components/actionsTabs/Deposit'
+import Withdraw from '@components/actionsTabs/Withdraw'
 
 export const ActionsTabs = () => {
     return (
-        <Box w="100%" padding="8px" maxW='lg' borderWidth='1px' borderRadius='lg' overflow='hidden'>
+        <Box w="100%" padding={8} maxW='lg' borderWidth='1px' borderRadius='md' rounded={'md'} overflow='hidden'>
             <Tabs>
                 <TabList>
-                    <Tab>Deposit</Tab>
+                    <Tab >Deposit</Tab>
                     <Tab>Withdraw</Tab>
                 </TabList>
 
