@@ -1,10 +1,10 @@
 import { useInkathon, useContract, contractQuery} from '@scio-labs/use-inkathon'
-import {deposit, Deposit} from 'shielder-sdk';
+import {deposit, Deposit, Withdraw} from 'shielder-sdk';
 import { Button, Flex, Text } from '@chakra-ui/react';
 
 import { WeightV2 } from '@polkadot/types/interfaces';
 import { ContractPromise } from "@polkadot/api-contract";
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import TokenABI from '../../abis/Token.json';
 import ShielderABI from '../../abis/Shielder.json';
@@ -12,7 +12,7 @@ import { TOKEN_CONTRACT_ADDRESS, SHIELDER_CONTRACT_ADDRESS, MAX_CALL_WEIGHT, PRO
 
 export default function ContractCall() {
   const [allowance, setAllowance] = useState('0');
-  const [leaf, setLeaf] = useState(0);
+  const [depositJSON, setDepositJSON] = useState<Deposit>({});
   const {api, activeAccount} = useInkathon();
   const tokenContract = useContract(TokenABI, TOKEN_CONTRACT_ADDRESS);
   const shielderContract = useContract(ShielderABI, SHIELDER_CONTRACT_ADDRESS);
@@ -118,7 +118,7 @@ export default function ContractCall() {
         ShielderABI,
         SHIELDER_CONTRACT_ADDRESS
       );
-
+        /// read for leaf_idx
       const { gasRequired, result, output } = await contractApi.query['deposit'](
         activeAccount?.address!,
         {
@@ -143,7 +143,10 @@ export default function ContractCall() {
       }, [0, 10, depositWASMJSON.note.map((not: number) => `${not}`), `0x${depositWASMJSON.proof}`])
   
       console.log('leaf', res.output?.toJSON());
-      setLeaf(res.output?.toJSON().ok);
+      let bare_leaf = res.output?.toJSON().ok.ok;
+      depositWASMJSON.leaf_idx = bare_leaf;
+      console.log('leaf2', depositWASMJSON.leaf_idx);
+      setDepositJSON(depositWASMJSON)
 
       const queryTx = await contractApi.tx['deposit'](
           {
@@ -165,6 +168,36 @@ export default function ContractCall() {
       console.log('api is not defined');
     }
   }
+
+  const withdrawTokens = async () => {
+    if(api) {
+        //TODO: get merkle root from Shielder
+        //TODO: get merkle_path from Shielder
+        //TODO: get recipient (field or connected wallet)
+
+
+      const withdr: Withdraw = {
+        deposit: depositJSON,
+        withdraw_amount: depositJSON.token_amount,
+        fee: 0,
+        merkle_root: [0,0,0,0], //TODO change
+        merkle_path: 0,         //TODO change
+        recipient: 'dupa'       //TODO change
+      };
+
+      //TODO: Dry run Shielder.withdraw to get updated DepositJSON
+      //TODO: SignAndCall Shielder.withdraw
+      //TODO: Sace updated DepositJSON if token_amount != 0
+    } else {
+      console.log('api is not defined');
+    }
+  }
+
+  useEffect(() => {
+    if(depositJSON) {
+      console.log(depositJSON);
+    }
+  }, [depositJSON])
 
   return (
     <Flex flexDirection={'column'} gap={2}>
