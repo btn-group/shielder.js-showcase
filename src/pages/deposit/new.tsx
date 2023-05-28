@@ -21,6 +21,8 @@ const NewDeposit = () => {
   const tokenContract = useContract(TokenABI, TOKEN_CONTRACT_ADDRESS);
   const shielderContract = useContract(ShielderABI, SHIELDER_CONTRACT_ADDRESS);
 
+  const [step, setStep] = useState(0);
+
   const [tokenId, setTokenId] = useState(0);
   const [allowanceAmount, setAllowanceAmount] = useState(0);
 
@@ -35,22 +37,22 @@ const getCurrentAllowance = async () => {
         TOKEN_CONTRACT_ADDRESS
       );
 
-      const { gasRequired } = await contractApi.query['psp22::increaseAllowance'](
-        activeAccount?.address!,
-        {
-          gasLimit: api?.registry.createType("WeightV2", {
-            refTime: MAX_CALL_WEIGHT,
-            proofSize: PROOFSIZE,
-          }) as WeightV2,
-          storageDepositLimit: null,
-        },
-        SHIELDER_CONTRACT_ADDRESS, 10
-      );
+    //   const { gasRequired } = await contractApi.query['psp22::increaseAllowance'](
+    //     activeAccount?.address!,
+    //     {
+    //       gasLimit: api?.registry.createType("WeightV2", {
+    //         refTime: MAX_CALL_WEIGHT,
+    //         proofSize: PROOFSIZE,
+    //       }) as WeightV2,
+    //       storageDepositLimit: null,
+    //     },
+    //     SHIELDER_CONTRACT_ADDRESS, 10
+    //   );
   
-      const gasLimit = api?.registry.createType(
-        "WeightV2",
-        gasRequired
-      ) as WeightV2;
+      const gasLimit = api?.registry.createType("WeightV2", {
+        refTime: MAX_CALL_WEIGHT,
+        proofSize: PROOFSIZE,
+      }) as WeightV2;
   
       const res = await contractQuery(api, activeAccount?.address!, tokenContract?.contract!, 'psp22::allowance', {
         gasLimit,
@@ -112,6 +114,8 @@ const getCurrentAllowance = async () => {
               console.log("finalized");
               console.log("suckmycess");
               console.log(res.toHuman());
+
+              setStep(2);
             }
           });
         } else {
@@ -119,7 +123,100 @@ const getCurrentAllowance = async () => {
         }
       }
 
-    return (
+      const depositTokens = async () => {
+        if(api) {
+          const dep: Deposit = {
+            token_id: 0,
+            token_amount: 10,
+            deposit_id: 0
+          };
+    
+          const depositWasmResult = await deposit(dep);
+          const depositWASMJSON = JSON.parse(depositWasmResult);
+    
+          const contractApi = new ContractPromise(
+            api,
+            ShielderABI,
+            SHIELDER_CONTRACT_ADDRESS
+          );
+            /// read for leaf_idx
+          const { gasRequired, result, output } = await contractApi.query['deposit'](
+            activeAccount?.address!,
+            {
+              gasLimit: api?.registry.createType("WeightV2", {
+                refTime: MAX_CALL_WEIGHT,
+                proofSize: PROOFSIZE,
+              }) as WeightV2,
+              storageDepositLimit: null,
+            },
+            // tokenid, value, note, proof
+            0, 10, depositWASMJSON.note.map((not: number) => `${not}`), `0x${depositWASMJSON.proof}`
+          );
+          
+          const gasLimit = api?.registry.createType(
+            "WeightV2",
+            gasRequired
+          ) as WeightV2;
+    
+          const res = await contractQuery(api, activeAccount?.address!, shielderContract?.contract!, 'deposit', {
+            gasLimit,
+            storageDepositLimit: null,
+          }, [0, 10, depositWASMJSON.note.map((not: number) => `${not}`), `0x${depositWASMJSON.proof}`])
+      
+          
+          let bare_leaf = res.output?.toJSON().ok.ok;
+          depositWASMJSON.leaf_idx = bare_leaf - 1;
+          depositWASMJSON.proof = `0x${depositWASMJSON.proof}`;
+          setDepositJSON(depositWASMJSON)
+    
+          const queryTx = await contractApi.tx['deposit'](
+              {
+                gasLimit,
+                storageDepositLimit: null,
+              },
+              0, 10, depositWASMJSON.note.map((not: number) => `${not}`), `0x${depositWASMJSON.proof}`
+            );
+          
+            await queryTx.signAndSend(activeAccount?.address!, async (res) => {
+              if (res.status.isInBlock) {
+                console.log("in a block");
+              } else if (res.status.isFinalized) {
+                console.log("deposit finalized");
+              }
+            });
+    
+        } else {
+          console.log('api is not defined');
+        }
+      }
+
+      if(step === 2) {
+        return (
+            <CenterBody>
+                <Stack minWidth={'400px'} spacing={8}>
+                    <Stack spacing={2}>
+                        <Heading>Deposit tokens</Heading>
+                        <Text>Deposit AZERO tokens to Liminal Shielder.</Text>
+                    </Stack>
+    
+                    <Button onClick={async () => await depositTokens()}
+                        size="lg"
+                        fontWeight="semibold"
+                        rounded="md"
+                        bgColor="white"
+                        color="black"
+                        _hover={{
+                            background: "gray.200",
+                        }}
+                    >Deposit</Button>
+    
+                    
+                </Stack>
+            </CenterBody>
+        )
+      }
+
+      return (
         <CenterBody>
             <Stack minWidth={'400px'} spacing={8}>
                 <Stack spacing={2}>
@@ -130,10 +227,10 @@ const getCurrentAllowance = async () => {
                 </Stack>
 
                 <Stack spacing={2}>
-                <Text fontSize={'sm'} textColor={'gray.300'}>TokenID</Text>
-                    <Input placeholder='Token ID' size='md' value={tokenId} onChange={e => setTokenId(parseInt(e.target.value))} />
+                    <Text fontSize={'sm'} textColor={'gray.300'}>TokenID</Text>
+                    <Input borderColor={'gray.500'} placeholder='Token ID' size='md' value={tokenId} onChange={e => setTokenId(parseInt(e.target.value))} />
                     <Text fontSize={'sm'} textColor={'gray.300'}>Allowance Amount</Text>
-                    <Input placeholder='Deposit amount' size='md' value={allowanceAmount} onChange={e => setAllowanceAmount(parseInt(e.target.value))} />
+                    <Input borderColor={'gray.500'} placeholder='Deposit amount' size='md' value={allowanceAmount} onChange={e => setAllowanceAmount(parseInt(e.target.value))} />
                 </Stack>
 
                 <Button onClick={async () => await increaseAllowance()}
@@ -151,6 +248,7 @@ const getCurrentAllowance = async () => {
             </Stack>
         </CenterBody>
     )
+    
 }
 
 export default NewDeposit
