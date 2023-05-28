@@ -1,9 +1,30 @@
-import { Box, Stack, TableContainer, Table, Thead, Tr, Th, Tbody, Td, Tfoot, Button, Text, HStack, Spacer, Flex, Link } from '@chakra-ui/react'
-import React from 'react'
-import 'twin.macro'
+import { Box, Stack, TableContainer, Table, Thead, Tr, Th, Tbody, Td, Tfoot, Button, Text, HStack, Spacer, Flex, Link } from '@chakra-ui/react';
+import React, { useEffect, useState } from 'react';
+import 'twin.macro';
+import { useLocalStorage } from '../../hooks';
+import { useRouter } from 'next/router';
 
 const Deposit = () => {
+    
+    const { setLocalStorageValue, getLocalStorageValue } = useLocalStorage();
+    const [deposits, setDeposits] = useState([]);
+    const [shouldLoad, setShouldLoad] = useState(true);
 
+    const getDeposits = () => {
+        const depositsJSONLS = getLocalStorageValue('deposits');
+        const depositsArr = depositsJSONLS ? JSON.parse(depositsJSONLS) : [];
+        console.log(depositsArr)
+        return depositsArr;
+    }
+
+    useEffect(() => {
+        if(deposits.length === 0 && shouldLoad) {
+            const deps = getDeposits();
+            console.log(deps);
+            setDeposits(deps);
+            setShouldLoad(false);
+        }
+    })
 
     return (
         <Stack tw="p-16">
@@ -39,22 +60,28 @@ const Deposit = () => {
                         <Thead>
                             <Tr>
                                 <Th>Proof</Th>
-                                <Th textAlign={'center'}>Date</Th>
-                                <Th textAlign={'center'} isNumeric>Value</Th>
+                                <Th textAlign={'center'}>Value</Th>
                                 <Th textAlign={'right'}>Action</Th>
                             </Tr>
                         </Thead>
                         <Tbody>
-                            <Tr>
-                                <Td>inches</Td>
-                                <Td textAlign={'center'}>millimetres (mm)</Td>
-                                <Td textAlign={'center'} isNumeric>25.4</Td>
+                        {deposits.map((deposit, index) => (
+                            <Tr key={index}>
+                                <Td>{deposit.proof.replace(/(.{50})..+/, "$1…")}</Td>
+                                <Td textAlign={'center'}>{deposit.token_amount}</Td>
                                 <Td>
                                     <Flex justifyContent={'flex-end'}>
-                                        <Button size="sm">Withdraw</Button>
+                                    <Link
+                                        href={`/withdraw/${deposit.leaf_idx}`}
+                                        className="group"
+                                        tw="hover:no-underline no-underline self-center"
+                                    >
+                                        <Button size={'sm'}>Withdraw</Button>
+                                    </Link>
                                     </Flex>
                                 </Td>
                             </Tr>
+                        ))}
                         </Tbody>
                     </Table>
                 </TableContainer>

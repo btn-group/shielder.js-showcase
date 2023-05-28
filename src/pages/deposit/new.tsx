@@ -22,7 +22,9 @@ const NewDeposit = () => {
   const tokenContract = useContract(TokenABI, TOKEN_CONTRACT_ADDRESS);
   const shielderContract = useContract(ShielderABI, SHIELDER_CONTRACT_ADDRESS);
 
-  const { setLocalStorageValue } = useLocalStorage();
+  const [balance, setBalance] = useState(0);
+
+  const { setLocalStorageValue, getLocalStorageValue } = useLocalStorage();
 
   const [step, setStep] = useState(0);
 
@@ -30,29 +32,15 @@ const NewDeposit = () => {
   const [allowanceAmount, setAllowanceAmount] = useState(0);
   const [depositAmount, setDepositAmount] = useState(0);
 
-  const currentAddress = activeAccount?.address;
-const { contract }  = shielderContract;
+useEffect(() => {
+    if(activeAccount) {
+        getCurrentAllowance();
+        getBalanceOf();
+    }
+  });
 
 const getCurrentAllowance = async () => {
     if (api) {
-      const contractApi = new ContractPromise(
-        api,
-        TokenABI,
-        TOKEN_CONTRACT_ADDRESS
-      );
-
-    //   const { gasRequired } = await contractApi.query['psp22::increaseAllowance'](
-    //     activeAccount?.address!,
-    //     {
-    //       gasLimit: api?.registry.createType("WeightV2", {
-    //         refTime: MAX_CALL_WEIGHT,
-    //         proofSize: PROOFSIZE,
-    //       }) as WeightV2,
-    //       storageDepositLimit: null,
-    //     },
-    //     SHIELDER_CONTRACT_ADDRESS, 10
-    //   );
-  
       const gasLimit = api?.registry.createType("WeightV2", {
         refTime: MAX_CALL_WEIGHT,
         proofSize: PROOFSIZE,
@@ -66,15 +54,7 @@ const getCurrentAllowance = async () => {
       console.log(res.output?.toJSON())
       setAllowance(res.output?.toJSON()?.ok);
     }
-    
-  }
-
-  useEffect(() => {
-    if(activeAccount) {
-        getCurrentAllowance();
-    }
-    
-  })
+  };
 
     const increaseAllowance = async () => {
         if(api) {
@@ -180,8 +160,11 @@ const getCurrentAllowance = async () => {
           depositWASMJSON.proof = `0x${depositWASMJSON.proof}`;
           setDepositJSON(depositWASMJSON);
 
+            const depositsJSONLS = getLocalStorageValue('deposits');
+            const depositsArr = depositsJSONLS ? JSON.parse(depositsJSONLS) : [];
+            depositsArr.push(depositWASMJSON)
+            setLocalStorageValue("deposits", JSON.stringify(depositsArr));
 
-      setLocalStorageValue("deposit", depositWASMJSON);
     
           const queryTx = await contractApi.tx['deposit'](
               {
@@ -207,6 +190,33 @@ const getCurrentAllowance = async () => {
         }
       }
 
+      const getBalanceOf = async () => {
+        if (api) {
+          const contractApi = new ContractPromise(
+            api,
+            TokenABI,
+            TOKEN_CONTRACT_ADDRESS
+          );
+    
+          const { output } = await contractApi.query['psp22::balanceOf'](
+            activeAccount?.address!,
+            {
+              gasLimit: api?.registry.createType("WeightV2", {
+                refTime: MAX_CALL_WEIGHT,
+                proofSize: PROOFSIZE,
+              }) as WeightV2,
+              storageDepositLimit: null,
+            },
+            activeAccount?.address!,
+          );
+    
+
+          console.log(output?.toJSON())
+          setBalance(output?.toJSON()?.ok);
+        }
+    
+      };
+
       if(step === 2) {
         return (
             <CenterBody>
@@ -216,6 +226,7 @@ const getCurrentAllowance = async () => {
                         <Text>Deposit AZERO tokens to Liminal Shielder.</Text>
 
                         <Text fontSize={'sm'} textColor={'gray.300'}>Current Allowance: {allowance}</Text>
+                        <Text fontSize={'sm'} textColor={'gray.300'}>Current Balance: {balance}</Text>
                     </Stack>
 
                     <Stack spacing={2}>
@@ -304,7 +315,11 @@ const getCurrentAllowance = async () => {
                     <Heading>Set allowance</Heading>
                     <Text>Set token allowance for the spender.</Text>
 
-                    <Text fontSize={'sm'} textColor={'gray.300'}>Current Allowance: {allowance}</Text>
+                    <Stack>
+                        <Text fontSize={'sm'} textColor={'gray.300'}>Current Allowance: {allowance}</Text>
+                        <Text fontSize={'sm'} textColor={'gray.300'}>Current Balance: {balance}</Text>
+                    </Stack>
+
                 </Stack>
 
                 <Stack spacing={2}>
