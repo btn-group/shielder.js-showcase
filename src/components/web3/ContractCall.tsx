@@ -330,6 +330,42 @@ export default function ContractCall() {
     }
   };
 
+  const getBalanceOf = async () => {
+    if (api) {
+      const contractApi = new ContractPromise(
+        api,
+        TokenABI,
+        TOKEN_CONTRACT_ADDRESS
+      );
+
+      const { gasRequired } = await contractApi.query['psp22::balanceOf'](
+        activeAccount?.address!,
+        {
+          gasLimit: api?.registry.createType("WeightV2", {
+            refTime: MAX_CALL_WEIGHT,
+            proofSize: PROOFSIZE,
+          }) as WeightV2,
+          storageDepositLimit: null,
+        },
+        activeAccount?.address!,
+      );
+
+      const gasLimit = api?.registry.createType(
+        "WeightV2",
+        gasRequired
+      ) as WeightV2;
+
+      const res = await contractQuery(api, activeAccount?.address!, tokenContract?.contract!, 'psp22::allowance', {
+        gasLimit,
+        storageDepositLimit: null,
+      }, [activeAccount?.address!])
+
+      console.log(res.output?.toJSON())
+      setBalance(res.output?.toJSON()?.ok);
+    }
+
+  };
+
   useEffect(() => {
     if (depositJSON) {
       console.log(depositJSON);
