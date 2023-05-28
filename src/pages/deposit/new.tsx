@@ -1,4 +1,4 @@
-import { Button, Heading, Input, Link, Stack, Text } from '@chakra-ui/react'
+import { Button, Heading, Input, Link, Stack, Text, Image } from '@chakra-ui/react'
 import { CenterBody } from '@components/layout/CenterBody';
 import React, { useEffect, useState } from 'react'
 
@@ -127,13 +127,14 @@ const getCurrentAllowance = async () => {
       const depositTokens = async () => {
         if(api) {
           const dep: Deposit = {
-            token_id: 0,
-            token_amount: 10,
+            token_id: tokenId,
+            token_amount: depositAmount,
             deposit_id: 0
           };
     
           setStep(3);
           const depositWasmResult = await deposit(dep);
+          console.log(depositWasmResult)
           const depositWASMJSON = JSON.parse(depositWasmResult);
     
           const contractApi = new ContractPromise(
@@ -142,7 +143,7 @@ const getCurrentAllowance = async () => {
             SHIELDER_CONTRACT_ADDRESS
           );
             /// read for leaf_idx
-          const { gasRequired, result, output } = await contractApi.query['deposit'](
+          const { gasRequired } = await contractApi.query['deposit'](
             activeAccount?.address!,
             {
               gasLimit: api?.registry.createType("WeightV2", {
@@ -235,8 +236,11 @@ const getCurrentAllowance = async () => {
                         <Heading>Generating proof</Heading>
                         <Text>We’re generating proof for deposit.</Text>
                     </Stack>
-    
-    {/* TODO: Minin gif... */}
+
+                    <Stack mx={'auto'}>
+                        <Image boxSize="200px" src="/mining-gif.gif" mx={'auto'} />
+                    </Stack>
+                    
                     <Text fontSize={'sm'} textColor={'gray.300'}>Please wait. It might takes 2 minutes...</Text>
                 </Stack>
             </CenterBody>
@@ -251,9 +255,12 @@ const getCurrentAllowance = async () => {
                         <Heading>Deposit successful</Heading>
                         <Text>Deposit successfully attached to the blockain.</Text>
                     </Stack>
-    
-    {/* TODO: Success gif... */}
-    <Link
+                
+                <Stack mx={'auto'}>
+                    <Image boxSize="200px" src="/party-gif.gif" />
+                </Stack>
+
+                <Link
                     href="/deposit"
                     className="group"
                     tw="hover:no-underline no-underline self-center"
@@ -293,17 +300,33 @@ const getCurrentAllowance = async () => {
                     <Input borderColor={'gray.500'} placeholder='Deposit amount' size='md' value={allowanceAmount} onChange={e => setAllowanceAmount(parseInt(e.target.value))} />
                 </Stack>
 
-                <Button onClick={async () => await increaseAllowance()}
-                    size="lg"
-                    fontWeight="semibold"
-                    rounded="md"
-                    bgColor="white"
-                    color="black"
-                    isDisabled={!activeAccount}
-                    _hover={{
-                        background: "gray.200",
-                    }}
-                >{!activeAccount ? "Connect wallet" : "Increase Allowance"}</Button>
+                <Stack spacing={2}>
+                    <Button onClick={async () => await increaseAllowance()}
+                        size="lg"
+                        fontWeight="semibold"
+                        rounded="md"
+                        bgColor="white"
+                        color="black"
+                        isDisabled={!activeAccount}
+                        _hover={{
+                            background: "gray.200",
+                        }}
+                    >{!activeAccount ? "Connect wallet" : "Increase Allowance"}</Button>
+
+                    <Button onClick={() => setStep(2)}
+                        size="lg"
+                        fontWeight="semibold"
+                        rounded="md"
+                        borderColor={'gray.300'}
+                        color={'gray.100'}
+                        bgColor="black"
+                        isDisabled={!activeAccount}
+                        _hover={{
+                            background: "gray.800",
+                        }}
+                    >Skip allowance</Button>
+                </Stack>
+
 
                 
             </Stack>
