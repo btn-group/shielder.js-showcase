@@ -1,36 +1,32 @@
-import { Button, HStack, Heading, Input, Stack, Text } from '@chakra-ui/react';
+import { Button, HStack, Heading, Input, Stack, Text, Image, Link } from '@chakra-ui/react';
 import { CenterBody } from '@components/layout/CenterBody';
 import { useLocalStorage } from '@hooks';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
-import { useInkathon, useContract, contractQuery } from '@scio-labs/use-inkathon'
-import {deposit, Deposit, Withdraw, withdraw, parseData} from 'shielder-sdk';
+import { useInkathon, useContract } from '@scio-labs/use-inkathon'
+import {Deposit, Withdraw, withdraw} from 'shielder-sdk';
 
 import { WeightV2 } from '@polkadot/types/interfaces';
 import { ContractPromise } from "@polkadot/api-contract";
 
 import TokenABI from '../../abis/Token.json';
 import ShielderABI from '../../abis/Shielder.json';
-import { TOKEN_CONTRACT_ADDRESS, SHIELDER_CONTRACT_ADDRESS, MAX_CALL_WEIGHT, PROOFSIZE } from '@constants';
-import { getCurrentAllowance, getCurrentMerkleRoot, getMerklePath, withdrawDryRun } from '@utils/shielder';
+import { TOKEN_CONTRACT_ADDRESS, SHIELDER_CONTRACT_ADDRESS } from '@constants';
+import { getCurrentMerkleRoot, getMerklePath, withdrawDryRun } from '@utils/shielder';
 import { decodeAddress } from '@polkadot/util-crypto';
 
 const withdrawView = () => {
   const router = useRouter();
   const depositLeafIdx = router.query.id;
 
-  const { setLocalStorageValue, getLocalStorageValue } = useLocalStorage();
+  const [step, setStep] = useState(0);
 
-  const [depositToWithdraw, setDepositToWithdraw] = useState();
-  const [shouldLoad, setShouldLoad] = useState(true);
+  const { setLocalStorageValue, getLocalStorageValue } = useLocalStorage();
 
   const [recipient, setRecipient] = useState('');
 
-  const [allowance, setAllowance] = useState('0');
-  const [depositJSON, setDepositJSON] = useState<Deposit>({});
   const {api, activeAccount} = useInkathon();
-  const tokenContract = useContract(TokenABI, TOKEN_CONTRACT_ADDRESS);
   const shielderContract = useContract(ShielderABI, SHIELDER_CONTRACT_ADDRESS);
 
   const getDepositByLeafIdx = () => {
@@ -109,13 +105,6 @@ const withdrawView = () => {
 
       console.log(withdrawData);
 
-      console.time("WITHDRAW");
-      const withdrawWasmResult = await withdraw(withdrawData);
-      console.timeEnd("WITHDRAW");
-      const withdrawWASMJSON = JSON.parse(withdrawWasmResult);
-      console.log({ withdrawWASMJSON });
-
-      withdrawData.recipient = recipient;
 
       // //TODO: Dry run Shielder.withdraw to get updated DepositJSON
       const withdrawDryRunResult = await withdrawDryRun(
@@ -124,7 +113,21 @@ const withdrawView = () => {
         contract!,
         withdrawData
       );
-      console.log({ withdrawDryRunResult });
+      // console.log(withdrawDryRunResult.output?.toJSON().ok.err);
+      if(withdrawDryRunResult.output?.toJSON().ok.err) {
+        console.log('in err', withdrawDryRunResult.result.toJSON())
+        setStep(4);
+        return;
+      }
+
+      console.time("WITHDRAW");
+      setStep(2);
+      const withdrawWasmResult = await withdraw(withdrawData);
+      console.timeEnd("WITHDRAW");
+      const withdrawWASMJSON = JSON.parse(withdrawWasmResult);
+      console.log({ withdrawWASMJSON });
+
+      withdrawData.recipient = recipient;
 
       const { gasRequired } = withdrawDryRunResult;
 
@@ -153,7 +156,8 @@ const withdrawView = () => {
           console.log("in a block");
         } else if (res.status.isFinalized) {
           console.log("deposit finalized");
-          console.log(res.status);
+          console.log(res.status.toHuman());
+          setStep(3);
 
           removeDepositFromLS();
           // TODO: Remove current deposit from local storage;
@@ -164,6 +168,101 @@ const withdrawView = () => {
       console.log("api is not defined");
     }
   };
+
+  if(step === 2) {
+    return (
+        <CenterBody>
+            <Stack minWidth={'400px'} spacing={8}>
+                <Stack spacing={2}>
+                    <Heading>Generating proof</Heading>
+                    <Text>We’re generating proof for deposit.</Text>
+                </Stack>
+
+                <Stack mx={'auto'}>
+                    <Image boxSize="200px" src="/mining-gif.gif" mx={'auto'} />
+                </Stack>
+                
+                <Text fontSize={'sm'} textColor={'gray.300'}>Please wait. It might take up to 80 seconds...</Text>
+            </Stack>
+        </CenterBody>
+    )
+  }
+
+  if(step === 3) {
+    return (
+        <CenterBody>
+            <Stack minWidth={'400px'} spacing={8}>
+                <Stack spacing={2}>
+                    <Heading>Withdraw successful</Heading>
+                    <Text>Withdrawed successfully from given deposit.</Text>
+                </Stack>
+            
+            <Stack mx={'auto'} w={'full'}>
+                <Image boxSize="200px" src="/party-gif.gif" mx={'auto'} />
+            </Stack>
+
+            <Link
+                href="/deposit"
+                className="group"
+                tw="hover:no-underline no-underline self-center"
+                width={'full'}
+             >
+                 <Button 
+                 bgColor="whiteAlpha.900"
+                 fontWeight={'semibold'}
+                 width={'full'}
+                 px={4}
+                 py={3}
+                 color="black"
+                 _hover={{
+                     background: "whiteAlpha.800",
+                 }}
+             >
+                    Go to deposits
+                </Button>
+            </Link>
+            </Stack>
+        </CenterBody>
+    )
+  }
+
+  if(step === 4) {
+    return (
+        <CenterBody>
+            <Stack minWidth={'400px'} spacing={8}>
+                <Stack spacing={2}>
+                    <Heading>Withdraw failed</Heading>
+                    <Text>Something failed. Please do not contact us.</Text>
+                </Stack>
+            
+            <Stack mx={'auto'} w={'full'}>
+                <Image boxSize="200px" src="/trashy-pepe.gif" mx={'auto'} />
+            </Stack>
+
+            <Link
+                href="/deposit"
+                className="group"
+                tw="hover:no-underline no-underline self-center"
+                width={'full'}
+             >
+                 <Button 
+                 bgColor="whiteAlpha.900"
+                 fontWeight={'semibold'}
+                 width={'full'}
+                 px={4}
+                 py={3}
+                 color="black"
+                 _hover={{
+                     background: "whiteAlpha.800",
+                 }}
+             >
+                    Go to deposits
+                </Button>
+            </Link>
+            </Stack>
+        </CenterBody>
+    )
+  }
 
   return (
     <CenterBody>

@@ -24,9 +24,9 @@ const TopBar = () => {
             <Link tw="flex items-center py-2 mx-4" href="/deposit">
                 <Text>Deposits</Text>
             </Link>
-            <Link tw="flex items-center py-2 mx-4" href="/withdraw">
+            {/* <Link tw="flex items-center py-2 mx-4" href="/withdraw">
                 <Text>Withdraw</Text>
-            </Link>
+            </Link> */}
             <Box>
                 <ConnectButton />
             </Box>

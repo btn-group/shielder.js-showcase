@@ -3,7 +3,7 @@ import { CenterBody } from '@components/layout/CenterBody';
 import React, { useEffect, useState } from 'react'
 
 import { useInkathon, useContract, contractQuery } from '@scio-labs/use-inkathon'
-import {deposit, Deposit, Withdraw, withdraw, parseData} from 'shielder-sdk';
+import {deposit, Deposit} from 'shielder-sdk';
 
 import { WeightV2 } from '@polkadot/types/interfaces';
 import { ContractPromise } from "@polkadot/api-contract";
@@ -17,20 +17,16 @@ import { useLocalStorage } from '../../hooks';
 
 const NewDeposit = () => {
     const [allowance, setAllowance] = useState('0');
-  const [depositJSON, setDepositJSON] = useState<Deposit>({});
   const {api, activeAccount} = useInkathon();
   const tokenContract = useContract(TokenABI, TOKEN_CONTRACT_ADDRESS);
-  const shielderContract = useContract(ShielderABI, SHIELDER_CONTRACT_ADDRESS);
 
   const [balance, setBalance] = useState(0);
-
-  const { setLocalStorageValue, getLocalStorageValue } = useLocalStorage();
-
   const [step, setStep] = useState(0);
-
   const [tokenId, setTokenId] = useState(0);
   const [allowanceAmount, setAllowanceAmount] = useState(0);
   const [depositAmount, setDepositAmount] = useState(0);
+
+  const { setLocalStorageValue, getLocalStorageValue } = useLocalStorage();
 
 useEffect(() => {
     if(activeAccount) {
@@ -118,7 +114,9 @@ const getCurrentAllowance = async () => {
           };
     
           setStep(3);
+          console.time('deposit')
           const depositWasmResult = await deposit(dep);
+          console.timeEnd('deposit')
           console.log(depositWasmResult)
           const depositWASMJSON = JSON.parse(depositWasmResult);
     
@@ -144,21 +142,10 @@ const getCurrentAllowance = async () => {
             "WeightV2",
             gasRequired
           ) as WeightV2;
-
-          console.log('dry run first', output?.toHuman());
-
-        //   const res = await contractQuery(api, activeAccount?.address!, shielderContract?.contract!, 'deposit', {
-        //     gasLimit,
-        //     storageDepositLimit: null,
-        //   }, [tokenId, depositAmount, depositWASMJSON.note.map((not: number) => `${not}`), `0x${depositWASMJSON.proof}`])
-
-        //   console.log('output', res.output?.toHuman().ok)
     
-        console.log(output?.toJSON().ok.ok);
           let bare_leaf = output?.toJSON().ok.ok;
           depositWASMJSON.leaf_idx = bare_leaf - 1;
           depositWASMJSON.proof = `0x${depositWASMJSON.proof}`;
-          setDepositJSON(depositWASMJSON);
 
             const depositsJSONLS = getLocalStorageValue('deposits');
             const depositsArr = depositsJSONLS ? JSON.parse(depositsJSONLS) : [];
@@ -235,13 +222,15 @@ const getCurrentAllowance = async () => {
                 </Stack>
     
                     <Button onClick={async () => await depositTokens()}
-                        size="lg"
-                        fontWeight="semibold"
-                        rounded="md"
                         bgColor="white"
+                        fontWeight={'semibold'}
+                        rounded={'md'}
+                        width={'100%'}
+                        px={4}
+                        py={2}
                         color="black"
                         _hover={{
-                            background: "gray.200",
+                            background: "gray.300",
                         }}
                     >Deposit</Button>
     
@@ -264,7 +253,7 @@ const getCurrentAllowance = async () => {
                         <Image boxSize="200px" src="/mining-gif.gif" mx={'auto'} />
                     </Stack>
                     
-                    <Text fontSize={'sm'} textColor={'gray.300'}>Please wait. It might takes 2 minutes...</Text>
+                    <Text fontSize={'sm'} textColor={'gray.300'}>Please wait. It might takes up to 20 seconds...</Text>
                 </Stack>
             </CenterBody>
         )
@@ -289,19 +278,20 @@ const getCurrentAllowance = async () => {
                     tw="hover:no-underline no-underline self-center"
                     width={'full'}
                  >
-                     <Button 
-                     bgColor="whiteAlpha.900"
-                     fontWeight={'semibold'}
-                     width={'full'}
-                     px={4}
-                     py={3}
-                     color="black"
-                     _hover={{
-                         background: "whiteAlpha.800",
-                     }}
+                     <Text 
+                      bgColor="white"
+                      fontWeight={'semibold'}
+                      rounded={'md'}
+                      px={4}
+                      py={2}
+                      color="black"
+                      textAlign={'center'}
+                      _hover={{
+                          background: "gray.300",
+                      }}
                  >
                         Go to deposits
-                    </Button>
+                    </Text>
                 </Link>
                 </Stack>
             </CenterBody>
@@ -331,29 +321,31 @@ const getCurrentAllowance = async () => {
 
                 <Stack spacing={2}>
                     <Button onClick={async () => await increaseAllowance()}
-                        size="lg"
-                        fontWeight="semibold"
-                        rounded="md"
-                        bgColor="white"
-                        color="black"
                         isDisabled={!activeAccount}
+                        bgColor="white"
+                        fontWeight={'semibold'}
+                        rounded={'md'}
+                        width={'100%'}
+                        px={4}
+                        py={2}
+                        color="black"
                         _hover={{
-                            background: "gray.200",
+                            background: "gray.300",
                         }}
                     >{!activeAccount ? "Connect wallet" : "Increase Allowance"}</Button>
 
-                    {/* <Button onClick={() => setStep(2)}
-                        size="lg"
+                    <Button onClick={() => setStep(2)}
                         fontWeight="semibold"
                         rounded="md"
                         borderColor={'gray.300'}
                         color={'gray.100'}
+                        width={'100%'}
                         bgColor="black"
                         isDisabled={!activeAccount}
                         _hover={{
                             background: "gray.800",
                         }}
-                    >Skip allowance</Button> */}
+                    >Skip allowance</Button>
                 </Stack>
 
 

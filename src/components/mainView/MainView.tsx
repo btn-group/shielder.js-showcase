@@ -1,4 +1,4 @@
-import { HStack, Spacer, VStack, Text, Button } from '@chakra-ui/react'
+import { HStack, Spacer, VStack, Text } from '@chakra-ui/react'
 import Link from 'next/link'
 import React from 'react'
 import 'twin.macro'
@@ -18,15 +18,17 @@ export const MainView = () => {
                     className="group"
                     tw="hover:no-underline no-underline self-center"
                 >
-                    <Button fontWeight="semibold"
+                    <Text fontWeight="semibold"
                         rounded="md"
-                        bgColor="whiteAlpha.900"
+                        bgColor="white"
                         color="black"
+                        px={4}
+                        py={2}
                         _hover={{
-                            background: "whiteAlpha.800",
+                            background: "gray.200",
                         }}>
                         Let me deposit tokens!
-                    </Button>
+                    </Text>
                 </Link>
             </VStack>
 
@@ -43,16 +45,18 @@ export const MainView = () => {
                     className="group"
                     tw="hover:no-underline no-underline rounded-md self-center"
                 >
-                    <Button 
+                    <Text 
                         fontWeight="semibold"
                         rounded="md"
-                        bgColor="whiteAlpha.900"
+                        bgColor="white"
                         color="black"
+                        px={4}
+                        py={2}
                         _hover={{
-                            background: "whiteAlpha.800",
+                            background: "gray.200",
                         }}>
                         Let me withdraw tokens!
-                    </Button>
+                    </Text>
                 </Link>
             </VStack>
         </HStack>
