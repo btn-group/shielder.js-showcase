@@ -22,7 +22,7 @@ const TopBar = () => {
             </Box>
             <Spacer />
             <Link tw="flex items-center py-2 mx-4" href="/deposit">
-                <Text>Deposit</Text>
+                <Text>Deposits</Text>
             </Link>
             <Link tw="flex items-center py-2 mx-4" href="/withdraw">
                 <Text>Withdraw</Text>

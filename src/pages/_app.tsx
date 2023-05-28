@@ -37,7 +37,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     }
 
     init();
-  })
+  });
 
   return (
     <>
@@ -79,7 +79,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 
       <UseInkathonProvider
         appName="shielder.js" // TODO
-        connectOnInit={false}
+        connectOnInit={true}
         defaultChain={development}
       >
         <CacheProvider value={cache}>

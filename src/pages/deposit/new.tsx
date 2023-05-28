@@ -142,8 +142,8 @@ const getCurrentAllowance = async () => {
             ShielderABI,
             SHIELDER_CONTRACT_ADDRESS
           );
-            /// read for leaf_idx
-          const { gasRequired } = await contractApi.query['deposit'](
+
+          const { gasRequired, output } = await contractApi.query['deposit'](
             activeAccount?.address!,
             {
               gasLimit: api?.registry.createType("WeightV2", {
@@ -152,7 +152,6 @@ const getCurrentAllowance = async () => {
               }) as WeightV2,
               storageDepositLimit: null,
             },
-            // tokenid, value, note, proof
             tokenId, depositAmount, depositWASMJSON.note.map((not: number) => `${not}`), `0x${depositWASMJSON.proof}`
           );
           
@@ -161,13 +160,13 @@ const getCurrentAllowance = async () => {
             gasRequired
           ) as WeightV2;
     
-          const res = await contractQuery(api, activeAccount?.address!, shielderContract?.contract!, 'deposit', {
-            gasLimit,
-            storageDepositLimit: null,
-          }, [tokenId, depositAmount, depositWASMJSON.note.map((not: number) => `${not}`), `0x${depositWASMJSON.proof}`])
+        //   const res = await contractQuery(api, activeAccount?.address!, shielderContract?.contract!, 'deposit', {
+        //     gasLimit,
+        //     storageDepositLimit: null,
+        //   }, [tokenId, depositAmount, depositWASMJSON.note.map((not: number) => `${not}`), `0x${depositWASMJSON.proof}`])
       
           
-          let bare_leaf = res.output?.toJSON().ok.ok;
+          let bare_leaf = output?.toJSON().ok.ok;
           depositWASMJSON.leaf_idx = bare_leaf - 1;
           depositWASMJSON.proof = `0x${depositWASMJSON.proof}`;
           setDepositJSON(depositWASMJSON)
@@ -185,11 +184,12 @@ const getCurrentAllowance = async () => {
                 console.log("in a block");
               } else if (res.status.isFinalized) {
                 console.log("deposit finalized");
+                console.log(res.status.toHuman())
+                console.log(res.toHuman())
                 setStep(4);
                 // TODO: Save deposit to LS.
               }
             });
-    
         } else {
           console.log('api is not defined');
         }
@@ -256,18 +256,20 @@ const getCurrentAllowance = async () => {
                         <Text>Deposit successfully attached to the blockain.</Text>
                     </Stack>
                 
-                <Stack mx={'auto'}>
-                    <Image boxSize="200px" src="/party-gif.gif" />
+                <Stack mx={'auto'} w={'full'}>
+                    <Image boxSize="200px" src="/party-gif.gif" mx={'auto'} />
                 </Stack>
 
                 <Link
                     href="/deposit"
                     className="group"
                     tw="hover:no-underline no-underline self-center"
+                    width={'full'}
                  >
                      <Button 
                      bgColor="whiteAlpha.900"
                      fontWeight={'semibold'}
+                     width={'full'}
                      px={4}
                      py={3}
                      color="black"
@@ -313,7 +315,7 @@ const getCurrentAllowance = async () => {
                         }}
                     >{!activeAccount ? "Connect wallet" : "Increase Allowance"}</Button>
 
-                    <Button onClick={() => setStep(2)}
+                    {/* <Button onClick={() => setStep(2)}
                         size="lg"
                         fontWeight="semibold"
                         rounded="md"
@@ -324,7 +326,7 @@ const getCurrentAllowance = async () => {
                         _hover={{
                             background: "gray.800",
                         }}
-                    >Skip allowance</Button>
+                    >Skip allowance</Button> */}
                 </Stack>
 
 

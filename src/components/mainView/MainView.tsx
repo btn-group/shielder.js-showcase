@@ -1,6 +1,4 @@
-import { Box, HStack, Spacer, VStack, Text, Button, Flex } from '@chakra-ui/react'
-import { ConnectButton } from '@components/web3/ConnectButton'
-import ContractCall from '@components/web3/ContractCall'
+import { HStack, Spacer, VStack, Text, Button } from '@chakra-ui/react'
 import Link from 'next/link'
 import React from 'react'
 import 'twin.macro'
@@ -56,7 +54,6 @@ export const MainView = () => {
                         Let me withdraw tokens!
                     </Button>
                 </Link>
-                <ContractCall />
             </VStack>
         </HStack>
     )
