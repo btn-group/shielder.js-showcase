@@ -1,4 +1,4 @@
-import { Button, Heading, Input, Stack, Text } from '@chakra-ui/react'
+import { Button, Heading, Input, Link, Stack, Text } from '@chakra-ui/react'
 import { CenterBody } from '@components/layout/CenterBody';
 import React, { useEffect, useState } from 'react'
 
@@ -25,6 +25,7 @@ const NewDeposit = () => {
 
   const [tokenId, setTokenId] = useState(0);
   const [allowanceAmount, setAllowanceAmount] = useState(0);
+  const [depositAmount, setDepositAmount] = useState(0);
 
   const currentAddress = activeAccount?.address;
 const { contract }  = shielderContract;
@@ -131,6 +132,7 @@ const getCurrentAllowance = async () => {
             deposit_id: 0
           };
     
+          setStep(3);
           const depositWasmResult = await deposit(dep);
           const depositWASMJSON = JSON.parse(depositWasmResult);
     
@@ -150,7 +152,7 @@ const getCurrentAllowance = async () => {
               storageDepositLimit: null,
             },
             // tokenid, value, note, proof
-            0, 10, depositWASMJSON.note.map((not: number) => `${not}`), `0x${depositWASMJSON.proof}`
+            tokenId, depositAmount, depositWASMJSON.note.map((not: number) => `${not}`), `0x${depositWASMJSON.proof}`
           );
           
           const gasLimit = api?.registry.createType(
@@ -161,7 +163,7 @@ const getCurrentAllowance = async () => {
           const res = await contractQuery(api, activeAccount?.address!, shielderContract?.contract!, 'deposit', {
             gasLimit,
             storageDepositLimit: null,
-          }, [0, 10, depositWASMJSON.note.map((not: number) => `${not}`), `0x${depositWASMJSON.proof}`])
+          }, [tokenId, depositAmount, depositWASMJSON.note.map((not: number) => `${not}`), `0x${depositWASMJSON.proof}`])
       
           
           let bare_leaf = res.output?.toJSON().ok.ok;
@@ -174,7 +176,7 @@ const getCurrentAllowance = async () => {
                 gasLimit,
                 storageDepositLimit: null,
               },
-              0, 10, depositWASMJSON.note.map((not: number) => `${not}`), `0x${depositWASMJSON.proof}`
+              tokenId, depositAmount, depositWASMJSON.note.map((not: number) => `${not}`), `0x${depositWASMJSON.proof}`
             );
           
             await queryTx.signAndSend(activeAccount?.address!, async (res) => {
@@ -182,6 +184,8 @@ const getCurrentAllowance = async () => {
                 console.log("in a block");
               } else if (res.status.isFinalized) {
                 console.log("deposit finalized");
+                setStep(4);
+                // TODO: Save deposit to LS.
               }
             });
     
@@ -197,7 +201,14 @@ const getCurrentAllowance = async () => {
                     <Stack spacing={2}>
                         <Heading>Deposit tokens</Heading>
                         <Text>Deposit AZERO tokens to Liminal Shielder.</Text>
+
+                        <Text fontSize={'sm'} textColor={'gray.300'}>Current Allowance: {allowance}</Text>
                     </Stack>
+
+                    <Stack spacing={2}>
+                    <Text fontSize={'sm'} textColor={'gray.300'}>Deposit amount</Text>
+                    <Input borderColor={'gray.500'} placeholder='Deposit amount' size='md' value={depositAmount} onChange={e => setDepositAmount(parseInt(e.target.value))} />
+                </Stack>
     
                     <Button onClick={async () => await depositTokens()}
                         size="lg"
@@ -211,6 +222,55 @@ const getCurrentAllowance = async () => {
                     >Deposit</Button>
     
                     
+                </Stack>
+            </CenterBody>
+        )
+      }
+
+      if(step === 3) {
+        return (
+            <CenterBody>
+                <Stack minWidth={'400px'} spacing={8}>
+                    <Stack spacing={2}>
+                        <Heading>Generating proof</Heading>
+                        <Text>We’re generating proof for deposit.</Text>
+                    </Stack>
+    
+    {/* TODO: Minin gif... */}
+                    <Text fontSize={'sm'} textColor={'gray.300'}>Please wait. It might takes 2 minutes...</Text>
+                </Stack>
+            </CenterBody>
+        )
+      }
+
+      if(step === 4) {
+        return (
+            <CenterBody>
+                <Stack minWidth={'400px'} spacing={8}>
+                    <Stack spacing={2}>
+                        <Heading>Deposit successful</Heading>
+                        <Text>Deposit successfully attached to the blockain.</Text>
+                    </Stack>
+    
+    {/* TODO: Success gif... */}
+    <Link
+                    href="/deposit"
+                    className="group"
+                    tw="hover:no-underline no-underline self-center"
+                 >
+                     <Button 
+                     bgColor="whiteAlpha.900"
+                     fontWeight={'semibold'}
+                     px={4}
+                     py={3}
+                     color="black"
+                     _hover={{
+                         background: "whiteAlpha.800",
+                     }}
+                 >
+                        Go to deposits
+                    </Button>
+                </Link>
                 </Stack>
             </CenterBody>
         )
@@ -239,10 +299,11 @@ const getCurrentAllowance = async () => {
                     rounded="md"
                     bgColor="white"
                     color="black"
+                    isDisabled={!activeAccount}
                     _hover={{
                         background: "gray.200",
                     }}
-                >Increase Allowance</Button>
+                >{!activeAccount ? "Connect wallet" : "Increase Allowance"}</Button>
 
                 
             </Stack>

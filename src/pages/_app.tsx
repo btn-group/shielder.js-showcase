@@ -13,6 +13,8 @@ import { Inconsolata } from 'next/font/google'
 import Head from 'next/head'
 import Router from 'next/router'
 import NProgress from 'nprogress'
+import { useEffect } from 'react'
+import { initWasm } from 'shielder-sdk';
 
 // Router Loading Animation with @tanem/react-nprogress
 Router.events.on('routeChangeStart', () => NProgress.start())
@@ -27,6 +29,15 @@ const inconsolata = Inconsolata({
 function MyApp({ Component, pageProps }: AppProps) {
   console.log(development);
   development.rpcUrls = ['ws://2.tcp.eu.ngrok.io:10860/ws'];
+
+
+  useEffect(() => {
+    async function init() {
+      await initWasm();
+    }
+
+    init();
+  })
 
   return (
     <>
