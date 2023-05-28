@@ -125,6 +125,8 @@ const getCurrentAllowance = async () => {
       }
 
       const depositTokens = async () => {
+        console.log({tokenId, allowanceAmount, depositAmount})
+
         if(api) {
           const dep: Deposit = {
             token_id: tokenId,
@@ -159,13 +161,17 @@ const getCurrentAllowance = async () => {
             "WeightV2",
             gasRequired
           ) as WeightV2;
-    
+
+          console.log('dry run first', output?.toHuman());
+
         //   const res = await contractQuery(api, activeAccount?.address!, shielderContract?.contract!, 'deposit', {
         //     gasLimit,
         //     storageDepositLimit: null,
         //   }, [tokenId, depositAmount, depositWASMJSON.note.map((not: number) => `${not}`), `0x${depositWASMJSON.proof}`])
-      
-          
+
+        //   console.log('output', res.output?.toHuman().ok)
+    
+        console.log(output?.toJSON().ok.ok);
           let bare_leaf = output?.toJSON().ok.ok;
           depositWASMJSON.leaf_idx = bare_leaf - 1;
           depositWASMJSON.proof = `0x${depositWASMJSON.proof}`;
@@ -176,7 +182,7 @@ const getCurrentAllowance = async () => {
                 gasLimit,
                 storageDepositLimit: null,
               },
-              tokenId, depositAmount, depositWASMJSON.note.map((not: number) => `${not}`), `0x${depositWASMJSON.proof}`
+              tokenId, depositAmount, depositWASMJSON.note.map((not: number) => `${not}`), depositWASMJSON.proof
             );
           
             await queryTx.signAndSend(activeAccount?.address!, async (res) => {
