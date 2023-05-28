@@ -171,6 +171,12 @@ export default function ContractCall() {
 
   const withdrawTokens = async () => {
     if(api) {
+      const contractApi = new ContractPromise(
+        api,
+        ShielderABI,
+        SHIELDER_CONTRACT_ADDRESS
+      );
+      
         const currentAddress = activeAccount?.address!;
         const { contract }  = shielderContract;
 
@@ -216,9 +222,35 @@ export default function ContractCall() {
 
       // //TODO: Dry run Shielder.withdraw to get updated DepositJSON
         const withdrawDryRunResult = await withdrawDryRun(api, currentAddress, contract!, withdrawData);
-        console.log({withdrawDryRunResult})
+        console.log({withdrawDryRunResult});
 
-      //TODO: SignAndCall Shielder.withdraw
+        const {gasRequired} = withdrawDryRunResult;
+  
+      const gasLimit = api?.registry.createType("WeightV2", gasRequired) as WeightV2;
+
+      const queryTx = await contractApi.tx['withdraw'](
+        {
+          gasLimit,
+          storageDepositLimit: null,
+        },
+        withdrawData.deposit.token_id, 
+        withdrawData.withdraw_amount, 
+        withdrawData.recipient,
+        withdrawData.fee,
+        withdrawData.merkle_root.map(num => num.toString()),
+        withdrawData.deposit.nullifier.map(num => num.toString()),
+        withdrawData.deposit.note.map(num => num.toString()),
+        withdrawData.deposit.proof,
+      );
+    
+      await queryTx.signAndSend(activeAccount?.address!, async (res) => {
+        if (res.status.isInBlock) {
+          console.log("in a block");
+        } else if (res.status.isFinalized) {
+          console.log("deposit finalized");
+          console.log(res.status);
+        }
+      });
       //TODO: Sace updated DepositJSON if token_amount != 0
     } else {
       console.log('api is not defined');

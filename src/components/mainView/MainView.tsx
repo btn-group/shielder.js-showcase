@@ -11,7 +11,7 @@ export const MainView = () => {
     return (
         <HStack alignItems="stretch" >
             <VStack alignItems="stretch" justifyContent="space-between" spacing="28px" tw="p-8 w-1/2 rounded-md" transition="all 1s" bgColor="gray.900" _hover={{
-                bgGradient: hoverGradient
+                bgColor: 'gray.800'
             }}>
                 <Text tw="pb-2" fontSize="2xl" fontWeight="Bold" >Deposit</Text>
                 <Text tw="pb-4" fontSize="md">Deposit your tokens to Liminal Shielder.</Text>
@@ -20,20 +20,22 @@ export const MainView = () => {
                     className="group"
                     tw="hover:no-underline no-underline self-center"
                 >
-                    <Button fontWeight="bold"
+                    <Button fontWeight="semibold"
                         rounded="md"
                         bgColor="whiteAlpha.900"
                         color="black"
                         _hover={{
                             background: "whiteAlpha.800",
                         }}>
-                        Let me deposit Tokens
+                        Let me deposit tokens!
                     </Button>
                 </Link>
             </VStack>
+
             <Spacer />
+
             <VStack alignItems="stretch" justifyContent="space-between" tw="p-8 w-1/2 rounded-md" spacing="28px" bgColor="gray.900" _hover={{
-                bgGradient: hoverGradient
+                bgColor: 'gray.800'
             }}>
 
                 <Text tw="pb-2" fontSize="2xl" fontWeight="Bold" >Withdraw</Text>
@@ -43,7 +45,8 @@ export const MainView = () => {
                     className="group"
                     tw="hover:no-underline no-underline rounded-md self-center"
                 >
-                    <Button fontWeight="bold"
+                    <Button 
+                        fontWeight="semibold"
                         rounded="md"
                         bgColor="whiteAlpha.900"
                         color="black"

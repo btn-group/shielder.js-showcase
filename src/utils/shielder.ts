@@ -4,6 +4,54 @@ import { WeightV2 } from "@polkadot/types/interfaces";
 import { ApiPromise } from "@polkadot/api";
 import { ContractPromise } from "@polkadot/api-contract";
 import {Deposit, Withdraw} from 'shielder-sdk';
+import TokenABI from '../abis/Token.json';
+
+export const getCurrentAllowance = async (api: ApiPromise, activeAccount: any) => {
+      const contractApi = new ContractPromise(
+        api,
+        TokenABI,
+        TOKEN_CONTRACT_ADDRESS
+      );
+
+      // const { gasRequired } = await contractApi.query['psp22::increaseAllowance'](
+      //   accountAddress,
+      //   {
+      //     gasLimit: api?.registry.createType("WeightV2", {
+      //       refTime: MAX_CALL_WEIGHT,
+      //       proofSize: PROOFSIZE,
+      //     }) as WeightV2,
+      //     storageDepositLimit: null,
+      //   },
+      //   SHIELDER_CONTRACT_ADDRESS, 10
+      // );
+
+  
+      // const gasLimit = api?.registry.createType(
+      //   "WeightV2",
+      //   gasRequired
+      // ) as WeightV2;
+  
+      // const res = await contractQuery(api, accountAddress, contract, 'psp22::allowance', {
+      //   gasLimit,
+      //   storageDepositLimit: null,
+      // }, [accountAddress, SHIELDER_CONTRACT_ADDRESS])
+  
+      // console.log(res.output?.toJSON())
+
+      const { output: out } = await contractApi.query['psp22::allowance'](
+        activeAccount?.address!,
+        {
+          gasLimit: api?.registry.createType("WeightV2", {
+            refTime: MAX_CALL_WEIGHT,
+            proofSize: PROOFSIZE,
+          }) as WeightV2,
+          storageDepositLimit: null,
+        },
+        SHIELDER_CONTRACT_ADDRESS, 10
+      );
+
+      return res.output?.toJSON()?.ok;
+}
 
 export const getCurrentMerkleRoot = async (api: ApiPromise, accountAddress: string, shielderContract: ContractPromise) => {
   const res = await contractQuery(api, accountAddress, shielderContract, 'currentMerkleRoot', {
@@ -57,5 +105,7 @@ export const withdrawDryRun = async (api: ApiPromise, accountAddress: string, sh
 
   console.log('withdrawDryRun', res.output?.toJSON());
 
-  return res.output?.toJSON()!.ok!;
+  return res;
+
+  // return res.output?.toJSON()!.ok!;
 }

@@ -6,9 +6,10 @@ import React from 'react'
 import 'twin.macro'
 
 const TopBar = () => {
-    const githubHref = 'https://github.com/Degen-Alliance/shielder.js'
+    const githubHref = 'https://github.com/Degen-Alliance/shielder.js';
+    
     return (
-        <Flex tw="p-4">
+        <Flex tw="p-4" alignItems={'center'}>
             <Box>
                 <Link
                     href="/"
