@@ -12,6 +12,7 @@ import TokenABI from '../../abis/Token.json';
 import ShielderABI from '../../abis/Shielder.json';
 import { TOKEN_CONTRACT_ADDRESS, SHIELDER_CONTRACT_ADDRESS, MAX_CALL_WEIGHT, PROOFSIZE } from '@constants';
 import { getCurrentAllowance } from '@utils/shielder';
+import { useLocalStorage } from '../../hooks';
 
 
 const NewDeposit = () => {
@@ -20,6 +21,8 @@ const NewDeposit = () => {
   const {api, activeAccount} = useInkathon();
   const tokenContract = useContract(TokenABI, TOKEN_CONTRACT_ADDRESS);
   const shielderContract = useContract(ShielderABI, SHIELDER_CONTRACT_ADDRESS);
+
+  const { setLocalStorageValue } = useLocalStorage();
 
   const [step, setStep] = useState(0);
 
@@ -169,7 +172,10 @@ const getCurrentAllowance = async () => {
           let bare_leaf = res.output?.toJSON().ok.ok;
           depositWASMJSON.leaf_idx = bare_leaf - 1;
           depositWASMJSON.proof = `0x${depositWASMJSON.proof}`;
-          setDepositJSON(depositWASMJSON)
+          setDepositJSON(depositWASMJSON);
+
+
+      setLocalStorageValue("deposit", depositWASMJSON);
     
           const queryTx = await contractApi.tx['deposit'](
               {
