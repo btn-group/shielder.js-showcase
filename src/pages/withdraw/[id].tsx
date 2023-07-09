@@ -80,10 +80,6 @@ const withdrawView = () => {
       // const merklePath = await getMerklePath(api, currentAddress, contract!, 65550);
       console.log({ merklePath });
 
-      // TODO: Na razie pusty, testowy adres. Docelowo ma być input z frontu, albo obecnie połączony wallet.
-      // const recipient = "5DWytQWs5WVg8akfFjavYFVkfUXBq11PZcfcTtH6tKqvboA6"; //burner
-      // console.log(amount);
-      // console.log(deposit.token_amount);
       const withdrawData: Withdraw = {
         deposit,
         withdraw_amount: amount,
