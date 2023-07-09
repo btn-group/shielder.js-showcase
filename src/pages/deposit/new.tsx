@@ -142,9 +142,18 @@ const getCurrentAllowance = async () => {
             "WeightV2",
             gasRequired
           ) as WeightV2;
-    
+          // This does not work as it always returns 0
           let bare_leaf = output?.toJSON().ok.ok;
-          depositWASMJSON.leaf_idx = bare_leaf - 1;
+          // depositWASMJSON.leaf_idx = bare_leaf - 1;
+
+          // The deposit_id needs to be retrieved from Shielder's emitted event
+          // But for simple testing we can use MERKLE_LEAVES from zk-apps/shielder/deploy/deploy.sh
+          // to figure out where it starts and go up from there.
+          // We can also figure this out by querying merklePath function
+          // with the leaf_idx via substrate contracts ui.
+          // The first one from the MERKLE_LEAVES number without a merklePath
+          // is the next leaf_idx
+          depositWASMJSON.leaf_idx = 65544;
           depositWASMJSON.proof = `0x${depositWASMJSON.proof}`;
 
             const depositsJSONLS = getLocalStorageValue('deposits');
