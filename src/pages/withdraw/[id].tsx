@@ -161,7 +161,7 @@ const withdrawView = () => {
           if (withdrawWASMJSON.token_amount > 0) {
             withdrawWASMJSON.proof = `0x${withdrawWASMJSON.proof}`;
             const depositsJSONLS = getLocalStorageValue('deposits');
-            const depositsArr = depositsJSONLS ? JSON.parse(depositsJSONLS) : [];
+            const depositsArr = JSON.parse(depositsJSONLS);
             depositsArr.push(withdrawWASMJSON)
             setLocalStorageValue("deposits", JSON.stringify(depositsArr));
           }
