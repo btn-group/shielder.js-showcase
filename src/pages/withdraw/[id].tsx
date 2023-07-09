@@ -28,6 +28,7 @@ const withdrawView = () => {
 
   const {api, activeAccount} = useInkathon();
   const shielderContract = useContract(ShielderABI, SHIELDER_CONTRACT_ADDRESS);
+  const [amount, setAmount] = useState(0);
 
   const getDepositByLeafIdx = () => {
     const depositsJSONLS = getLocalStorageValue('deposits');
@@ -81,10 +82,11 @@ const withdrawView = () => {
 
       // TODO: Na razie pusty, testowy adres. Docelowo ma być input z frontu, albo obecnie połączony wallet.
       // const recipient = "5DWytQWs5WVg8akfFjavYFVkfUXBq11PZcfcTtH6tKqvboA6"; //burner
-
+      // console.log(amount);
+      // console.log(deposit.token_amount);
       const withdrawData: Withdraw = {
         deposit,
-        withdraw_amount: deposit.token_amount,
+        withdraw_amount: amount,
         recipient: Array.from(decodeAddress(recipient)),
         fee: 0,
         merkle_root: currentMerkleRoot.map((num) => {
@@ -160,7 +162,13 @@ const withdrawView = () => {
           setStep(3);
 
           removeDepositFromLS();
-          // TODO: Remove current deposit from local storage;
+          if (withdrawWASMJSON.token_amount > 0) {
+            withdrawWASMJSON.proof = `0x${withdrawWASMJSON.proof}`;
+            const depositsJSONLS = getLocalStorageValue('deposits');
+            const depositsArr = depositsJSONLS ? JSON.parse(depositsJSONLS) : [];
+            depositsArr.push(withdrawWASMJSON)
+            setLocalStorageValue("deposits", JSON.stringify(depositsArr));
+          }
         }
       });
       
@@ -275,6 +283,11 @@ const withdrawView = () => {
                     <Stack spacing={2}>
                       <Text fontSize={'sm'} textColor={'gray.300'}>Recipient</Text>
                       <Input borderColor={'gray.500'} size='md' value={recipient} onChange={e => setRecipient(e.target.value)} />
+                    </Stack>
+
+                    <Stack spacing={2}>
+                      <Text fontSize={'sm'} textColor={'gray.300'}>Amount</Text>
+                      <Input borderColor={'gray.500'} size='md' value={amount} onChange={e => setAmount(parseInt(e.target.value))} />
                     </Stack>
                     
                     <Button onClick={async () => await withdrawTokens()}
