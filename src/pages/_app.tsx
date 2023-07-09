@@ -27,9 +27,7 @@ const inconsolata = Inconsolata({
 })
 
 function MyApp({ Component, pageProps }: AppProps) {
-  console.log(development);
-  development.rpcUrls = ['ws://5.tcp.eu.ngrok.io:19537/ws'];
-
+  development.rpcUrls = ['ws://127.0.0.1:9944'];
 
   useEffect(() => {
     async function init() {
