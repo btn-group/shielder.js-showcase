@@ -4,5 +4,5 @@
 
 1. Build & run
 ```sh
-npm installl && npm run dev.
+npm install && npm run dev
 ```
