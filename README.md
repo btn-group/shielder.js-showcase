@@ -7,7 +7,14 @@
 NEXT_PUBLIC_DEFAULT_CHAIN=development
 ```
 
-2. Build & run
+2. Update src/constants/index.ts
+```sh
+# Get from zk-apps/shielder/deploy/addresses.json
+export const SHIELDER_CONTRACT_ADDRESS = '';
+export const TOKEN_CONTRACT_ADDRESS = '';
+```
+
+3. Build & run
 ```sh
 npm install && npm run dev
 ```
