@@ -143,7 +143,7 @@ const getCurrentAllowance = async () => {
             gasRequired
           ) as WeightV2;
           // This does not work as it always returns 0
-          // let bare_leaf = output?.toJSON().ok.ok;
+          let bare_leaf = output?.toJSON().ok.ok;
           // depositWASMJSON.leaf_idx = bare_leaf - 1;
 
           // The deposit_id needs to be retrieved from Shielder's emitted event
