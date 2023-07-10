@@ -1,6 +1,6 @@
-import { Global } from '@emotion/react'
-import 'nprogress/nprogress.css'
-import tw, { css, GlobalStyles as BaseStyles } from 'twin.macro'
+import { Global } from "@emotion/react";
+import "nprogress/nprogress.css";
+import tw, { css, GlobalStyles as BaseStyles } from "twin.macro";
 
 const customStyles = css`
   html {
@@ -23,16 +23,16 @@ const customStyles = css`
     }
     .peg,
     .spinner {
-      ${tw`hidden!`}
+      ${tw`!hidden`}
     }
   }
-`
+`;
 
 const GlobalStyles = () => (
   <>
     <BaseStyles />
     <Global styles={customStyles} />
   </>
-)
+);
 
-export default GlobalStyles
+export default GlobalStyles;

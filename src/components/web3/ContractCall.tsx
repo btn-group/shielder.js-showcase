@@ -225,7 +225,7 @@ export default function ContractCall() {
         SHIELDER_CONTRACT_ADDRESS
       );
 
-      const deposit = getLocalStorageValue('deposit');
+      const deposit = getLocalStorageValue("deposit");
 
       setDepositJSON(deposit);
 
@@ -338,7 +338,7 @@ export default function ContractCall() {
         TOKEN_CONTRACT_ADDRESS
       );
 
-      const { gasRequired } = await contractApi.query['psp22::balanceOf'](
+      const { gasRequired } = await contractApi.query["psp22::balanceOf"](
         activeAccount?.address!,
         {
           gasLimit: api?.registry.createType("WeightV2", {
@@ -347,7 +347,7 @@ export default function ContractCall() {
           }) as WeightV2,
           storageDepositLimit: null,
         },
-        activeAccount?.address!,
+        activeAccount?.address!
       );
 
       const gasLimit = api?.registry.createType(
@@ -355,15 +355,21 @@ export default function ContractCall() {
         gasRequired
       ) as WeightV2;
 
-      const res = await contractQuery(api, activeAccount?.address!, tokenContract?.contract!, 'psp22::allowance', {
-        gasLimit,
-        storageDepositLimit: null,
-      }, [activeAccount?.address!])
+      const res = await contractQuery(
+        api,
+        activeAccount?.address!,
+        tokenContract?.contract!,
+        "psp22::allowance",
+        {
+          gasLimit,
+          storageDepositLimit: null,
+        },
+        [activeAccount?.address!]
+      );
 
-      console.log(res.output?.toJSON())
+      console.log(res.output?.toJSON());
       setBalance(res.output?.toJSON()?.ok);
     }
-
   };
 
   useEffect(() => {

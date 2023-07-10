@@ -1,5 +1,5 @@
-import { FC } from 'react'
-import { Toaster } from 'react-hot-toast'
+import { FC } from "react";
+import { Toaster } from "react-hot-toast";
 
 export const HotToastConfig: FC = () => {
   return (
@@ -8,18 +8,18 @@ export const HotToastConfig: FC = () => {
         top: 60,
       }}
       toastOptions={{
-        position: 'top-center',
+        position: "top-center",
         style: {
-          wordBreak: 'break-all',
-          maxWidth: '30rem',
-          background: '#1a1b1f',
-          color: 'white',
-          borderRadius: '12px',
+          wordBreak: "break-all",
+          maxWidth: "30rem",
+          background: "#1a1b1f",
+          color: "white",
+          borderRadius: "12px",
         },
         success: {
           duration: 5000,
         },
       }}
     />
-  )
-}
+  );
+};
