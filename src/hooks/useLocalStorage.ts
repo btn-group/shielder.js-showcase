@@ -1,4 +1,11 @@
 export const useLocalStorage = () => {
+  const addToDeposits = (depositWASMJSON: any): any => {
+    const depositsJSONLS = getLocalStorageValue("deposits");
+    const depositsArr = depositsJSONLS ? JSON.parse(depositsJSONLS) : [];
+    depositsArr.push(depositWASMJSON);
+    setLocalStorageValue("deposits", JSON.stringify(depositsArr));
+  };
+
   const getLocalStorageValue = (key: string): any => {
     try {
       const item = window.localStorage.getItem(key) as string;
@@ -16,5 +23,5 @@ export const useLocalStorage = () => {
     }
   };
 
-  return { getLocalStorageValue, setLocalStorageValue };
+  return { addToDeposits, getLocalStorageValue, setLocalStorageValue };
 };
