@@ -35,7 +35,8 @@ const withdrawView = () => {
 
   const [step, setStep] = useState(0);
 
-  const { addToDeposits, setLocalStorageValue, getLocalStorageValue } = useLocalStorage();
+  const { addToDeposits, setLocalStorageValue, getLocalStorageValue } =
+    useLocalStorage();
 
   const [recipient, setRecipient] = useState("");
 
