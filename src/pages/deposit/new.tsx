@@ -35,14 +35,12 @@ const NewDeposit = () => {
   const [allowance, setAllowance] = useState("0");
   const { api, activeAccount } = useInkathon();
   const tokenContract = useContract(TokenABI, TOKEN_CONTRACT_ADDRESS);
-
   const [balance, setBalance] = useState(0);
   const [step, setStep] = useState(0);
   const [tokenId, setTokenId] = useState(0);
   const [allowanceAmount, setAllowanceAmount] = useState(0);
   const [depositAmount, setDepositAmount] = useState(0);
-
-  const { setLocalStorageValue, getLocalStorageValue } = useLocalStorage();
+  const { addToDeposits } = useLocalStorage();
 
   useEffect(() => {
     if (activeAccount) {
@@ -185,11 +183,7 @@ const NewDeposit = () => {
       // is the next leaf_idx
       depositWASMJSON.leaf_idx = 65544;
       depositWASMJSON.proof = `0x${depositWASMJSON.proof}`;
-
-      const depositsJSONLS = getLocalStorageValue("deposits");
-      const depositsArr = depositsJSONLS ? JSON.parse(depositsJSONLS) : [];
-      depositsArr.push(depositWASMJSON);
-      setLocalStorageValue("deposits", JSON.stringify(depositsArr));
+      addToDeposits(depositWASMJSON);
 
       const queryTx = await contractApi.tx["deposit"](
         {
