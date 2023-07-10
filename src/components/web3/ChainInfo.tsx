@@ -1,36 +1,37 @@
-import { Card, Spinner } from '@chakra-ui/react'
-import { useInkathon } from '@scio-labs/use-inkathon'
-import Link from 'next/link'
-import { FC, useEffect, useState } from 'react'
-import { HiOutlineExternalLink } from 'react-icons/hi'
-import 'twin.macro'
+import { Card, Spinner } from "@chakra-ui/react";
+import { useInkathon } from "@scio-labs/use-inkathon";
+import Link from "next/link";
+import { FC, useEffect, useState } from "react";
+import { HiOutlineExternalLink } from "react-icons/hi";
+import "twin.macro";
 
 export const ChainInfo: FC = () => {
-  const { api, activeChain } = useInkathon()
-  const [chainInfo, setChainInfo] = useState<{ [_: string]: any }>()
+  const { api, activeChain } = useInkathon();
+  const [chainInfo, setChainInfo] = useState<{ [_: string]: any }>();
 
   // Fetch Chain Info
   const fetchChainInfo = async () => {
     if (!api) {
-      setChainInfo(undefined)
-      return
+      setChainInfo(undefined);
+      return;
     }
 
-    const chain = (await api.rpc.system.chain())?.toString() || ''
-    const version = (await api.rpc.system.version())?.toString() || ''
-    const properties = ((await api.rpc.system.properties())?.toHuman() as any) || {}
-    const tokenSymbol = properties?.tokenSymbol?.[0] || 'UNIT'
-    const tokenDecimals = properties?.tokenDecimals?.[0] || 12
+    const chain = (await api.rpc.system.chain())?.toString() || "";
+    const version = (await api.rpc.system.version())?.toString() || "";
+    const properties =
+      ((await api.rpc.system.properties())?.toHuman() as any) || {};
+    const tokenSymbol = properties?.tokenSymbol?.[0] || "UNIT";
+    const tokenDecimals = properties?.tokenDecimals?.[0] || 12;
     const chainInfo = {
       Chain: chain,
       Version: version,
       Token: `${tokenSymbol} (${tokenDecimals} Decimals)`,
-    }
-    setChainInfo(chainInfo)
-  }
+    };
+    setChainInfo(chainInfo);
+  };
   useEffect(() => {
-    fetchChainInfo()
-  }, [api])
+    fetchChainInfo();
+  }, [api]);
 
   // Connection Loading Indicator
   if (!api)
@@ -41,7 +42,7 @@ export const ChainInfo: FC = () => {
           Connecting to {activeChain?.name} ({activeChain?.rpcUrls?.[0]})
         </div>
       </div>
-    )
+    );
 
   return (
     <>
@@ -53,7 +54,10 @@ export const ChainInfo: FC = () => {
           {Object.entries(chainInfo || {}).map(([key, value]) => (
             <div key={key} tw="text-sm leading-7">
               {key}:
-              <strong tw="float-right ml-6 truncate max-w-[15rem]" title={value}>
+              <strong
+                tw="float-right ml-6 truncate max-w-[15rem]"
+                title={value}
+              >
                 {value}
               </strong>
             </div>
@@ -98,13 +102,19 @@ export const ChainInfo: FC = () => {
           <>
             <h2 tw="text-center font-mono text-red-400">Security Disclaimer</h2>
 
-            <Card variant="outline" p={4} bgColor="red.500" borderColor="red.300" fontSize={'sm'}>
-              You are interacting with un-audited mainnet contracts and risk all your funds. Never
-              transfer tokens to this contract.
+            <Card
+              variant="outline"
+              p={4}
+              bgColor="red.500"
+              borderColor="red.300"
+              fontSize={"sm"}
+            >
+              You are interacting with un-audited mainnet contracts and risk all
+              your funds. Never transfer tokens to this contract.
             </Card>
           </>
         )}
       </div>
     </>
-  )
-}
+  );
+};

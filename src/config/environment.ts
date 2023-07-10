@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
-import { getSupportedChains } from './getSupportedChains'
-import { getURL } from './getUrl'
+import { getSupportedChains } from "./getSupportedChains";
+import { getURL } from "./getUrl";
 
 /**
  * Environment Variables defined in `.env.local`.
@@ -9,8 +9,8 @@ import { getURL } from './getUrl'
  */
 export const env = {
   url: getURL(),
-  isProduction: process.env.NEXT_PUBLIC_PRODUCTION_MODE === 'true',
+  isProduction: process.env.NEXT_PUBLIC_PRODUCTION_MODE === "true",
 
   defaultChain: process.env.NEXT_PUBLIC_DEFAULT_CHAIN!,
   supportedChains: getSupportedChains(),
-}
+};

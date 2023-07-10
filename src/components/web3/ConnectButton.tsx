@@ -11,10 +11,10 @@ import {
   MenuList,
   Text,
   VStack,
-} from '@chakra-ui/react'
-import { env } from '@config/environment'
-import { InjectedAccount } from '@polkadot/extension-inject/types'
-import { encodeAddress } from '@polkadot/util-crypto'
+} from "@chakra-ui/react";
+import { env } from "@config/environment";
+import { InjectedAccount } from "@polkadot/extension-inject/types";
+import { encodeAddress } from "@polkadot/util-crypto";
 import {
   SubstrateChain,
   SubstrateWalletPlatform,
@@ -23,16 +23,16 @@ import {
   isWalletInstalled,
   useBalance,
   useInkathon,
-} from '@scio-labs/use-inkathon'
-import { truncateHash } from '@utils/truncateHash'
-import { useIsSSR } from '@utils/useIsSSR'
-import { FC, useState } from 'react'
-import { toast } from 'react-hot-toast'
-import { AiOutlineCheckCircle, AiOutlineDisconnect } from 'react-icons/ai'
-import { FiChevronDown, FiExternalLink } from 'react-icons/fi'
-import 'twin.macro'
+} from "@scio-labs/use-inkathon";
+import { truncateHash } from "@utils/truncateHash";
+import { useIsSSR } from "@utils/useIsSSR";
+import { FC, useState } from "react";
+import { toast } from "react-hot-toast";
+import { AiOutlineCheckCircle, AiOutlineDisconnect } from "react-icons/ai";
+import { FiChevronDown, FiExternalLink } from "react-icons/fi";
+import "twin.macro";
 
-export interface ConnectButtonProps { }
+export interface ConnectButtonProps {}
 export const ConnectButton: FC<ConnectButtonProps> = () => {
   const {
     activeChain,
@@ -43,15 +43,19 @@ export const ConnectButton: FC<ConnectButtonProps> = () => {
     activeAccount,
     accounts,
     setActiveAccount,
-  } = useInkathon()
-  const { balanceFormatted } = useBalance(activeAccount?.address)
+  } = useInkathon();
+  const { balanceFormatted } = useBalance(activeAccount?.address);
   const [supportedChains] = useState(
-    env.supportedChains.map((networkId) => getSubstrateChain(networkId) as SubstrateChain),
-  )
+    env.supportedChains.map(
+      (networkId) => getSubstrateChain(networkId) as SubstrateChain
+    )
+  );
   const [browserWallets] = useState(
-    allSubstrateWallets.filter((w) => w.platforms.includes(SubstrateWalletPlatform.Browser)),
-  )
-  const isSSR = useIsSSR()
+    allSubstrateWallets.filter((w) =>
+      w.platforms.includes(SubstrateWalletPlatform.Browser)
+    )
+  );
+  const isSSR = useIsSSR();
 
   // Connect Button
   if (!activeAccount)
@@ -74,7 +78,11 @@ export const ConnectButton: FC<ConnectButtonProps> = () => {
           Connect Wallet
         </MenuButton>
 
-        <MenuList bgColor="blackAlpha.900" borderColor="whiteAlpha.300" rounded="2xl">
+        <MenuList
+          bgColor="blackAlpha.900"
+          borderColor="whiteAlpha.300"
+          rounded="2xl"
+        >
           {/* Installed Wallets */}
           {!isSSR &&
             !activeAccount &&
@@ -83,7 +91,7 @@ export const ConnectButton: FC<ConnectButtonProps> = () => {
                 <MenuItem
                   key={w.id}
                   onClick={() => {
-                    connect?.(undefined, w)
+                    connect?.(undefined, w);
                   }}
                   tw="bg-transparent hocus:bg-gray-800"
                 >
@@ -104,11 +112,11 @@ export const ConnectButton: FC<ConnectButtonProps> = () => {
                     <Text fontSize="xs">Not installed</Text>
                   </VStack>
                 </MenuItem>
-              ),
+              )
             )}
         </MenuList>
       </Menu>
-    )
+    );
 
   // Account Menu & Disconnect Button
   return (
@@ -143,7 +151,13 @@ export const ConnectButton: FC<ConnectButtonProps> = () => {
           <VStack spacing={0.5}>
             <AccountName account={activeAccount} />
             <Text fontSize="xs" fontWeight="normal" opacity={0.75}>
-              {truncateHash(encodeAddress(activeAccount.address, activeChain?.ss58Prefix || 42), 8)}
+              {truncateHash(
+                encodeAddress(
+                  activeAccount.address,
+                  activeChain?.ss58Prefix || 42
+                ),
+                8
+              )}
             </Text>
           </VStack>
         </MenuButton>
@@ -162,15 +176,17 @@ export const ConnectButton: FC<ConnectButtonProps> = () => {
             key={chain.network}
             isDisabled={chain.network === activeChain?.network}
             onClick={async () => {
-              await switchActiveChain?.(chain)
-              toast.success(`Switched to ${chain.name}`)
+              await switchActiveChain?.(chain);
+              toast.success(`Switched to ${chain.name}`);
             }}
             tw="bg-transparent hocus:bg-gray-800"
           >
             <VStack align="start" spacing={0}>
               <HStack>
                 <Text>{chain.name}</Text>
-                {chain.network === activeChain?.network && <AiOutlineCheckCircle size={16} />}
+                {chain.network === activeChain?.network && (
+                  <AiOutlineCheckCircle size={16} />
+                )}
               </HStack>
             </VStack>
           </MenuItem>
@@ -179,26 +195,31 @@ export const ConnectButton: FC<ConnectButtonProps> = () => {
         {/* Available Accounts/Wallets */}
         <MenuDivider />
         {(accounts || []).map((acc) => {
-          const encodedAddress = encodeAddress(acc.address, activeChain?.ss58Prefix || 42)
-          const truncatedEncodedAddress = truncateHash(encodedAddress, 10)
+          const encodedAddress = encodeAddress(
+            acc.address,
+            activeChain?.ss58Prefix || 42
+          );
+          const truncatedEncodedAddress = truncateHash(encodedAddress, 10);
           return (
             <MenuItem
               key={encodedAddress}
               isDisabled={acc.address === activeAccount.address}
               onClick={() => {
-                setActiveAccount?.(acc)
+                setActiveAccount?.(acc);
               }}
               tw="bg-transparent hocus:bg-gray-800"
             >
               <VStack align="start" spacing={0}>
                 <HStack>
                   <AccountName account={acc} />
-                  {acc.address === activeAccount.address && <AiOutlineCheckCircle size={16} />}
+                  {acc.address === activeAccount.address && (
+                    <AiOutlineCheckCircle size={16} />
+                  )}
                 </HStack>
                 <Text fontSize="xs">{truncatedEncodedAddress}</Text>
               </VStack>
             </MenuItem>
-          )
+          );
         })}
 
         {/* Disconnect Button */}
@@ -212,14 +233,14 @@ export const ConnectButton: FC<ConnectButtonProps> = () => {
         </MenuItem>
       </MenuList>
     </Menu>
-  )
-}
+  );
+};
 
 export interface AccountNameProps {
-  account: InjectedAccount
+  account: InjectedAccount;
 }
 export const AccountName: FC<AccountNameProps> = ({ account, ...rest }) => {
-  const { activeChain } = useInkathon()
+  const { activeChain } = useInkathon();
   // const { primaryDomain } = useResolveAddressToDomain(
   //   activeChain?.network === SupportedChainId.AlephZeroTestnet ? account?.address : undefined,
   //   {
@@ -243,5 +264,5 @@ export const AccountName: FC<AccountNameProps> = ({ account, ...rest }) => {
       {/* {primaryDomain || account.name}
       {!!primaryDomain && <Image src={aznsIconSvg} alt="AZERO.ID Logo" width={11} height={11} />} */}
     </Text>
-  )
-}
+  );
+};

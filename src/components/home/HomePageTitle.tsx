@@ -1,14 +1,13 @@
-import Image from 'next/image'
-import Link from 'next/link'
-import shilederLogo from 'public/brand/shielder-logo.png'
-import { FC } from 'react'
-import 'twin.macro'
-
+import Image from "next/image";
+import Link from "next/link";
+import shilederLogo from "public/brand/shielder-logo.png";
+import { FC } from "react";
+import "twin.macro";
 
 export const HomePageTitle: FC = () => {
-  const title = 'shielderJS'
-  const desc = 'Zero Knowledge proof in browser. Keep your private data localy'
-  const githubHref = 'https://github.com/Degen-Alliance/shielder.js'
+  const title = "shielderJS";
+  const desc = "Zero Knowledge proof in browser. Keep your private data localy";
+  const githubHref = "https://github.com/Degen-Alliance/shielder.js";
 
   return (
     <>
@@ -18,7 +17,7 @@ export const HomePageTitle: FC = () => {
           href={githubHref}
           target="_blank"
           className="group"
-          tw="flex flex-col cursor-pointer items-center gap-4 rounded-3xl py-1.5 px-3.5 transition-all hover:bg-gray-900"
+          tw="flex cursor-pointer flex-col items-center gap-4 rounded-3xl py-1.5 px-3.5 transition-all hover:bg-gray-900"
         >
           <Image src={shilederLogo} priority width={60} alt="shielderJS Logo" />
           <h1 tw="font-black text-[2.5rem]">{title}</h1>
@@ -26,7 +25,7 @@ export const HomePageTitle: FC = () => {
 
         {/* Tagline & Links */}
         <p tw="mt-2 text-gray-600 text-sm">
-          By{' '}
+          By{" "}
           <a
             href="https://github.com/Degen-Alliance"
             target="_blank"
@@ -40,5 +39,5 @@ export const HomePageTitle: FC = () => {
         <div tw="my-14 w-14 bg-gray-800 h-[2px]" />
       </div>
     </>
-  )
-}
+  );
+};

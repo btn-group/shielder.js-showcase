@@ -1,39 +1,45 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-env node */
 
-const path = require('path')
+const path = require("path");
 
 // The folders containing files importing twin.macro
-const includedDirs = [path.resolve(__dirname, 'src')]
+const includedDirs = [path.resolve(__dirname, "src")];
 
 module.exports = function withTwin(nextConfig) {
   return {
     ...nextConfig,
     webpack(config, options) {
-      const { dev, isServer } = options
-      config.module = config.module || {}
-      config.module.rules = config.module.rules || []
+      const { dev, isServer } = options;
+      config.module = config.module || {};
+      config.module.rules = config.module.rules || [];
       config.module.rules.push({
         test: /\.(tsx|ts)$/,
         include: includedDirs,
         use: [
           options.defaultLoaders.babel,
           {
-            loader: 'babel-loader',
+            loader: "babel-loader",
             options: {
               sourceMaps: dev,
               presets: [
-                ['@babel/preset-react', { runtime: 'automatic', importSource: '@emotion/react' }],
+                [
+                  "@babel/preset-react",
+                  { runtime: "automatic", importSource: "@emotion/react" },
+                ],
               ],
               plugins: [
-                require.resolve('babel-plugin-macros'),
-                require.resolve('@emotion/babel-plugin'),
-                [require.resolve('@babel/plugin-syntax-typescript'), { isTSX: true }],
+                require.resolve("babel-plugin-macros"),
+                require.resolve("@emotion/babel-plugin"),
+                [
+                  require.resolve("@babel/plugin-syntax-typescript"),
+                  { isTSX: true },
+                ],
               ],
             },
           },
         ],
-      })
+      });
 
       if (!isServer) {
         config.resolve.fallback = {
@@ -43,14 +49,14 @@ module.exports = function withTwin(nextConfig) {
           path: false,
           os: false,
           crypto: false,
-        }
+        };
       }
 
-      if (typeof nextConfig.webpack === 'function') {
-        return nextConfig.webpack(config, options)
+      if (typeof nextConfig.webpack === "function") {
+        return nextConfig.webpack(config, options);
       } else {
-        return config
+        return config;
       }
     },
-  }
-}
+  };
+};

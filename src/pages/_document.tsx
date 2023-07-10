@@ -1,4 +1,4 @@
-import { extractCritical } from '@emotion/server'
+import { extractCritical } from "@emotion/server";
 import Document, {
   DocumentContext,
   DocumentInitialProps,
@@ -6,29 +6,31 @@ import Document, {
   Html,
   Main,
   NextScript,
-} from 'next/document'
+} from "next/document";
 
 export type NewDocumentInitialProps = DocumentInitialProps & {
-  ids: string[]
-  css: string
-}
+  ids: string[];
+  css: string;
+};
 export default class MyDocument extends Document<NewDocumentInitialProps> {
   // Emotion Critical SSR Styles
-  static async getInitialProps(ctx: DocumentContext): Promise<DocumentInitialProps> {
-    const initialProps = await Document.getInitialProps(ctx)
-    const critical = extractCritical(initialProps.html)
-    initialProps.html = critical.html
+  static async getInitialProps(
+    ctx: DocumentContext
+  ): Promise<DocumentInitialProps> {
+    const initialProps = await Document.getInitialProps(ctx);
+    const critical = extractCritical(initialProps.html);
+    initialProps.html = critical.html;
     initialProps.styles = (
       <>
         {initialProps.styles}
         <style
-          data-emotion-css={critical.ids.join(' ')}
+          data-emotion-css={critical.ids.join(" ")}
           dangerouslySetInnerHTML={{ __html: critical.css }}
         />
       </>
-    )
+    );
 
-    return initialProps
+    return initialProps;
   }
 
   render() {
@@ -40,9 +42,23 @@ export default class MyDocument extends Document<NewDocumentInitialProps> {
           <link rel="shortcut icon" href="/favicon.ico" />
           <link rel="manifest" href="/site.webmanifest" />
           <meta name="msapplication-config" content="/browserconfig.xml" />
-          <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png" />
-          <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png" />
-          <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png" />
+          <link
+            rel="apple-touch-icon"
+            sizes="180x180"
+            href="/favicons/apple-touch-icon.png"
+          />
+          <link
+            rel="icon"
+            type="image/png"
+            sizes="32x32"
+            href="/favicons/favicon-32x32.png"
+          />
+          <link
+            rel="icon"
+            type="image/png"
+            sizes="16x16"
+            href="/favicons/favicon-16x16.png"
+          />
           <link rel="manifest" href="/site.webmanifest"></link>
           <meta name="msapplication-TileColor" content="#7e5da8" />
           <meta name="theme-color" content="#000000" />
@@ -53,6 +69,6 @@ export default class MyDocument extends Document<NewDocumentInitialProps> {
           <NextScript />
         </body>
       </Html>
-    )
+    );
   }
 }
